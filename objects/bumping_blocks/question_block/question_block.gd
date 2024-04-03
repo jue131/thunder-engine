@@ -23,13 +23,15 @@ func _physics_process(delta):
 		return
 
 
+@rpc("any_peer", "call_local", "reliable")
 func got_bumped(by: Node2D) -> void:
 	if _triggered: return
-	call_bump()
+	call_bump.rpc()
 
 
+@rpc("any_peer", "call_local", "reliable")
 func call_bump() -> void:
-	bump(true)
+	bump.rpc(true)
 	_animated_sprite_2d.animation = &"empty"
 
 

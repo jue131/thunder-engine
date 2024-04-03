@@ -105,6 +105,7 @@ var _suit_appear: bool
 @onready var control: PlayerControl = PlayerControl.new()
 @onready var starman_combo: Combo = Combo.new(self)
 
+@onready var inputs: Node = $Inputs
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var collision_recovery: RayCast2D = $CollisionRecovery
@@ -118,20 +119,9 @@ var _suit_appear: bool
 
 
 func _ready() -> void:
-	# Transition center at the beginning of the level
-	Scenes.scene_ready.connect(func():
-		var cam := Thunder._current_camera
-		if cam:
-			cam.force_update_scroll()
-		
-		for i in 8: # Deferred 8 frames to ensure the transition works after the player touches checkpoint
-			await get_tree().process_frame
-		
-		var trans := TransitionManager.current_transition
-		if is_instance_valid(trans):
-			trans.on(self)
-			trans.paused = false
-	, CONNECT_ONE_SHOT | CONNECT_DEFERRED)
+	if !multiplayer.multiplayer_peer is OfflineMultiplayerPeer:
+		queue_free()
+	_initiate_transition()
 	
 	if !Thunder._current_player_state:
 		Thunder._current_player_state = suit
@@ -149,11 +139,34 @@ func _ready() -> void:
 		Data.values.lives = ProjectSettings.get_setting("application/thunder_settings/player/default_lives", 4)
 
 
+func _initiate_transition() -> void:
+	# Transition center at the beginning of the level
+	Scenes.scene_ready.connect(func():
+		var cam := Thunder._current_camera
+		if cam:
+			cam.force_update_scroll()
+		
+		for i in 8: # Deferred 8 frames to ensure the transition works after the player touches checkpoint
+			await get_tree().process_frame
+		
+		var trans := TransitionManager.current_transition
+		if is_instance_valid(trans):
+			trans.on(self)
+			trans.paused = false
+	, CONNECT_ONE_SHOT | CONNECT_DEFERRED)
+
+
 var _starman_faded: bool
 
 func _physics_process(delta: float) -> void:
+	# Control
+	if !completed:
+		inputs.update(self)
+		control_process()
+	
 	if !Thunder._current_player_state:
 		Thunder._current_player_state = suit
+	
 	if is_starman && (
 		timer_starman.time_left > 0.0 &&
 		timer_starman.time_left < 1.5 &&
@@ -163,27 +176,24 @@ func _physics_process(delta: float) -> void:
 		Audio.stop_music_channel(98, true)
 
 
+func control_process() -> void:
+	left_right = inputs.motion.x
+	up_down = inputs.motion.y
+	jumping = inputs.jumping
+	jumped = inputs.jumped
+	running = inputs.running
+	attacking = inputs.attacking
+	attacked = inputs.attacked
+	slided = inputs.slided
+	is_crouching = inputs.is_crouching
+
+
 func change_suit(to: PlayerSuit, appear: bool = true, forced: bool = false) -> void:
 	_force_suit = forced
 	_suit_appear = appear
 	suit = to
 	_force_suit = false
 	_suit_appear = false
-
-
-func control_process() -> void:
-	left_right = int(Input.get_axis(control.left, control.right))
-	up_down = int(Input.get_axis(control.up, control.down))
-	jumping = int(Input.is_action_pressed(control.jump)) \
-		+ int(Input.is_action_just_pressed(control.jump))
-	jumped = Input.is_action_just_pressed(control.jump)
-	running = Input.is_action_pressed(control.run)
-	attacked = Input.is_action_just_pressed(control.attack)
-	attacking = Input.is_action_pressed(control.attack)
-	is_crouching = Input.is_action_pressed(control.down) \
-		&& is_on_floor() && suit && suit.physics_crouchable && !is_sliding
-	slided = Input.is_action_pressed(control.down) \
-		&& is_on_floor() && abs(rad_to_deg(get_floor_normal().x)) > 39
 
 
 #= Status

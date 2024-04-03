@@ -1,6 +1,7 @@
-[gd_scene load_steps=14 format=3 uid="uid://1do11cr84k7y"]
+[gd_scene load_steps=15 format=3 uid="uid://1do11cr84k7y"]
 
 [ext_resource type="Script" path="res://engine/objects/players/player.gd" id="1_ofdvu"]
+[ext_resource type="Script" path="res://engine/objects/players/player_input.gd" id="2_a04ls"]
 [ext_resource type="SpriteFrames" uid="uid://cp03ve7ed68js" path="res://engine/objects/players/prefabs/animations/mario/animation_mario_small.tres" id="2_eqact"]
 [ext_resource type="Shader" path="res://engine/objects/powerups/super_star/starman_hsv.gdshader" id="2_kdm1n"]
 [ext_resource type="Texture2D" uid="uid://iungoiwgrqth" path="res://engine/objects/players/prefabs/textures/mario/mario_dead.png" id="3_qpqdp"]
@@ -25,7 +26,7 @@ size = Vector2(1, 1)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_82odo"]
 size = Vector2(1, 1)
 
-[node name="Mario" type="CharacterBody2D" node_paths=PackedStringArray("death_sprite")]
+[node name="Mario" type="CharacterBody2D" node_paths=PackedStringArray("death_sprite") groups=["Player"]]
 collision_mask = 16
 slide_on_ceiling = false
 floor_max_angle = 0.837758
@@ -119,6 +120,9 @@ killing_detection_scale = 1.0
 trigger_enemy_failed_signal = false
 special_tags = Array[StringName]([&"no_score"])
 metadata/_edit_pinned_properties_ = [&"killing_detection_scale", &"killer_type", &"special_tags"]
+
+[node name="Inputs" type="Node" parent="."]
+script = ExtResource("2_a04ls")
 
 [connection signal="timeout" from="Starman" to="." method="_on_starman_timeout"]
 [connection signal="killed" from="Attack" to="." method="_on_starman_killed"]

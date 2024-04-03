@@ -17,13 +17,14 @@ func _physics_process(delta):
 		_animated_sprite_2d.animation = &"default"
 
 
+@rpc("any_peer", "call_remote", "reliable")
 func got_bumped(by: Node2D) -> void:
 	if _triggered: return
 	call_bump()
 
 
 func call_bump() -> void:
-	bump(false)
+	bump.rpc(false)
 	_animated_sprite_2d.animation = &"empty"
 	Thunder._current_player.change_suit(change_to_suit)
 	Data.values.lives = ProjectSettings.get_setting(&"application/thunder_settings/player/default_lives", 4)

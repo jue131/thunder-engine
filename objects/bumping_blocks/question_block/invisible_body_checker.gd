@@ -16,7 +16,7 @@ func _ready() -> void:
 		queue_free.call_deferred()
 	)
 
-
+@rpc("any_peer", "call_local", "reliable")
 func got_bumped(by: Node2D) -> void:
 	if !_active: return
 	if parent._triggered: return

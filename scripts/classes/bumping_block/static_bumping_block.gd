@@ -84,6 +84,7 @@ func _editor_process() -> void:
 ## If [code]disable[/code] is [code]true[/code], then all cast detectors will be disabled[br]
 ## [code]bump_rotation[/code] is the direction angle that the block moves when it is being bumped[br]
 ## [code]interrupy[/code] no usge currently
+@rpc("any_peer", "call_local", "reliable")
 func bump(disable: bool, bump_rotation: float = 0, interrupt: bool = false):
 	if _triggered: return
 	if !active: return

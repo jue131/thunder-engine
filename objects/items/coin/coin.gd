@@ -13,11 +13,13 @@ func _from_bumping_block() -> void:
 
 
 func _physics_process(delta):
-	if !Thunder._current_player: return
-	if overlaps_body(Thunder._current_player):
-		collect()
+	for i in get_tree().get_nodes_in_group(&"Player"):
+		if !is_instance_valid(i): continue
+		if overlaps_body(i):
+			collect.rpc()
 
 
+@rpc("any_peer", "call_local")#, "reliable")
 func collect() -> void:
 	Data.add_coin()
 	Data.values.score += 100

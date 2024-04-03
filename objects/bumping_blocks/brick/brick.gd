@@ -31,6 +31,7 @@ func bricks_break() -> void:
 	queue_free()
 
 
+@rpc("any_peer", "call_local", "reliable")
 func got_bumped(by: Node2D) -> void:
 	if _triggered: return
 	if by is Player:
@@ -39,20 +40,21 @@ func got_bumped(by: Node2D) -> void:
 			
 	# Brick with some result
 	if result && result.creation_nodepack:
-		brick_bump_logic()
+		brick_bump_logic.rpc()
 		return
 	
 	# Standard brick
 	if by is Player && by.suit.type == Data.PLAYER_POWER.SMALL:
-		bump(false)
+		bump.rpc(false)
 	else:
 		hit_attack()
 		bricks_break()
 	
 
+@rpc("any_peer", "call_local", "reliable")
 func brick_bump_logic() -> void:
 	if result_counter_value < 1: return
-	bump(false)
+	bump.rpc(false)
 	if result && !counter_enabled:
 		counter_enabled = true
 	

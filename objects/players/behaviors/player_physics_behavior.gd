@@ -16,8 +16,7 @@ func _physics_process(delta: float) -> void:
 	config = suit.physics_config
 	
 	delta = player.get_physics_process_delta_time()
-	# Control
-	if !player.completed: player.control_process()
+
 	# Shape
 	_shape_process()
 	if player.warp != Player.Warp.NONE: return
@@ -270,7 +269,7 @@ func _head_process() -> void:
 		((player.speed_previous.y < 0 && !collider.initially_visible_and_solid) || \
 		(player.is_on_ceiling() && collider.initially_visible_and_solid) || \
 		(player.is_crouching)):
-			collider.got_bumped.call_deferred(player)
+			collider.got_bumped.rpc(player)
 	
 	player.bubble.emitting = !player.is_underwater_out
 
