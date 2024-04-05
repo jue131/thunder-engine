@@ -27,7 +27,8 @@ func _ready() -> void:
 	if Data.values.lives == -1 && death_check_for_lives:
 		Data.values.lives = ProjectSettings.get_setting("application/thunder_settings/player/default_lives", 4)
 	
-	position = synced_position
+	if synced_position:
+		global_position = synced_position
 	if str(name).is_valid_int():
 		inputs_sync.set_multiplayer_authority(str(name).to_int())
 	
@@ -60,3 +61,11 @@ func _physics_process(delta: float) -> void:
 func set_player_name(value: String) -> void:
 	$Label.text = value
 	nickname = value
+
+
+func die(tags: Dictionary = {}) -> void:
+	if str(name).to_int() != multiplayer.get_unique_id():
+		return
+	
+	super(tags)
+	

@@ -1,0 +1,77 @@
+[gd_scene load_steps=3 format=3 uid="uid://dutax32ey1i8j"]
+
+[ext_resource type="Script" path="res://engine/scenes/multiplayer/mp_layer.gd" id="1_masif"]
+[ext_resource type="FontFile" uid="uid://solby4jceqlq" path="res://engine/fonts/MisterEarlBT-Regular.otf" id="2_33btc"]
+
+[node name="mp_layer" type="CanvasLayer"]
+layer = 3
+script = ExtResource("1_masif")
+
+[node name="Chat" type="Label" parent="."]
+self_modulate = Color(1, 1, 1, 0.5)
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = -128.0
+offset_right = -32.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(1, 0.65)
+theme_override_colors/font_outline_color = Color(0, 0, 0.372549, 1)
+theme_override_constants/outline_size = 8
+theme_override_constants/line_spacing = 0
+theme_override_fonts/font = ExtResource("2_33btc")
+theme_override_font_sizes/font_size = 22
+text = "1st
+2nd
+3rd
+4th
+5th"
+text_overrun_behavior = 1
+
+[node name="Spectator" type="Label" parent="."]
+self_modulate = Color(1, 1, 1, 0.7)
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 48.0
+offset_top = -416.0
+offset_right = -48.0
+offset_bottom = -318.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(1, 0.75)
+theme_override_colors/font_outline_color = Color(0, 0, 0.372549, 1)
+theme_override_constants/outline_size = 8
+theme_override_constants/line_spacing = 0
+theme_override_fonts/font = ExtResource("2_33btc")
+theme_override_font_sizes/font_size = 22
+text = "Spectating: %s
+Health: %d lives"
+horizontal_alignment = 1
+text_overrun_behavior = 1
+
+[node name="EnterMsg" type="LineEdit" parent="."]
+self_modulate = Color(1, 1, 1, 0.501961)
+offset_left = 32.0
+offset_top = 448.0
+offset_right = 608.0
+offset_bottom = 479.0
+scale = Vector2(1, 0.65)
+theme_override_colors/font_placeholder_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0.313726, 1)
+theme_override_colors/caret_color = Color(1, 1, 1, 1)
+theme_override_constants/outline_size = 8
+theme_override_constants/caret_width = 0
+theme_override_fonts/font = ExtResource("2_33btc")
+theme_override_font_sizes/font_size = 24
+placeholder_text = "Press Enter..."
+flat = true
+caret_blink = true
+
+[connection signal="focus_entered" from="EnterMsg" to="." method="_on_enter_msg_focus_entered"]
+[connection signal="focus_exited" from="EnterMsg" to="." method="_on_enter_msg_focus_exited"]

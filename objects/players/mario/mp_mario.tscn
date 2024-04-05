@@ -75,4 +75,3 @@ replication_config = SubResource("SceneReplicationConfig_thh3r")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." index="12"]
 replication_config = SubResource("SceneReplicationConfig_lhwof")
-visibility_update_mode = 1

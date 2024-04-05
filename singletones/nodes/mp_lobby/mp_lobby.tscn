@@ -46,18 +46,18 @@ offset_bottom = 208.0
 [node name="PortForward" type="Label" parent="Players"]
 layout_mode = 0
 offset_left = -80.0
-offset_top = 288.0
-offset_right = 223.0
-offset_bottom = 363.0
-text = "If you want non-LAN clients to connect,
-make sure the port %d in UDP
+offset_top = 256.0
+offset_right = 248.0
+offset_bottom = 331.0
+text = "If you're hosting and want non-LAN clients
+to connect, make sure the port %d in UDP
 is forwarded on your router."
 
 [node name="FindPublicIP" type="LinkButton" parent="Players"]
 layout_mode = 0
-offset_left = 240.0
+offset_left = 272.0
 offset_top = 320.0
-offset_right = 383.0
+offset_right = 415.0
 offset_bottom = 352.0
 text = "Find your public IP"
 
@@ -83,7 +83,7 @@ offset_top = 43.0
 offset_right = 160.0
 offset_bottom = 74.0
 text = "Mario"
-max_length = 15
+max_length = 8
 
 [node name="Label2" type="Label" parent="Connect"]
 layout_mode = 0
@@ -92,14 +92,6 @@ offset_top = 82.0
 offset_right = 63.0
 offset_bottom = 105.0
 text = "IP:"
-
-[node name="IPAddress" type="LineEdit" parent="Connect"]
-layout_mode = 0
-offset_left = 16.0
-offset_top = 108.0
-offset_right = 160.0
-offset_bottom = 139.0
-text = "127.0.0.1"
 
 [node name="Host" type="Button" parent="Connect"]
 layout_mode = 1
@@ -141,6 +133,14 @@ horizontal_alignment = 1
 
 [node name="Timer" type="Timer" parent="Connect"]
 wait_time = 10.0
+
+[node name="IPAddress" type="LineEdit" parent="Connect"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 108.0
+offset_right = 160.0
+offset_bottom = 139.0
+text = "127.0.0.1"
 
 [node name="ErrorDialog" type="AcceptDialog" parent="."]
 exclusive = false

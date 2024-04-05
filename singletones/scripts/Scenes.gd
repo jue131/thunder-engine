@@ -66,6 +66,8 @@ func goto_scene(path: String) -> void:
 	if !_current_scene_buffer || _current_scene_buffer.resource_path != path:
 		_current_scene_buffer = load(path)
 	load_scene_from_packed.call_deferred(_current_scene_buffer)
+	
+	
 
 
 func goto_scene_with_loading(path: String) -> void:

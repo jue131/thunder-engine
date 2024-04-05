@@ -44,13 +44,14 @@ func _physics_process(delta: float) -> void:
 			appear_process(Thunder.get_delta(delta))
 			z_index = -1
 	
-	var player: Player = Thunder._current_player
-	if !player: return
-	var overlaps: bool = body.overlaps_body(player)
-	if overlaps && !one_overlap:
-		collect()
-	if !overlaps && one_overlap:
-		one_overlap = false
+	for player in get_tree().get_nodes_in_group(&"Player"):
+		if !is_instance_valid(player): continue
+		
+		var overlaps: bool = body.overlaps_body(player)
+		if overlaps && !one_overlap:
+			collect.rpc_id(str(player.name).to_int())
+		if !overlaps && one_overlap:
+			one_overlap = false
 
 
 func appear_process(delta: float) -> void:
@@ -59,6 +60,7 @@ func appear_process(delta: float) -> void:
 	position -= Vector2(0, appear_speed).rotated(global_rotation) * delta
 
 
+@rpc("call_local")
 func collect() -> void:
 	_change_state_logic(force_powerup_state)
 	

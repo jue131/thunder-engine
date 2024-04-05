@@ -36,6 +36,8 @@ func _on_host_pressed():
 
 	var player_name = connect_name.text
 	Multiplayer.host_game(player_name)
+	#if ok:
+	#	Multiplayer.begin_game()
 	refresh_lobby()
 
 

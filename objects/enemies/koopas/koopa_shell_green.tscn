@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://ctpsv143q5pjv"]
+[gd_scene load_steps=21 format=3 uid="uid://ctpsv143q5pjv"]
 
 [ext_resource type="Script" path="res://engine/objects/enemies/koopas/koopa_shell.gd" id="1_4u51b"]
 [ext_resource type="Script" path="res://engine/scripts/nodes/enemies/enemy_attacked.gd" id="2_f14e0"]
@@ -72,6 +72,17 @@ animations = [{
 "speed": 30.0
 }]
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_xmimy"]
+properties/0/path = NodePath(".:speed")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:position")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:stopping")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+
 [node name="KoopaShellGreen" type="CharacterBody2D"]
 collision_layer = 2
 collision_mask = 32
@@ -137,8 +148,11 @@ position = Vector2(0, 2)
 script = ExtResource("11_vu45w")
 metadata/_edit_lock_ = true
 
-[connection signal="collided_wall" from="." to="." method="turn_x"]
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_xmimy")
+
 [connection signal="collided_wall" from="." to="." method="_on_collided_wall"]
+[connection signal="collided_wall" from="." to="." method="turn_x"]
 [connection signal="body_entered" from="Body" to="." method="_on_body_entered"]
 [connection signal="killed_succeeded" from="Body/EnemyAttacked" to="." method="queue_free" flags=3]
 [connection signal="killed_succeeded" from="Body/EnemyAttacked" to="Sprite" method="set_frame" binds= [0]]

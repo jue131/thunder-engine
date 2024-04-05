@@ -269,7 +269,7 @@ func _head_process() -> void:
 		((player.speed_previous.y < 0 && !collider.initially_visible_and_solid) || \
 		(player.is_on_ceiling() && collider.initially_visible_and_solid) || \
 		(player.is_crouching)):
-			collider.got_bumped.rpc(player)
+			collider.got_bumped.rpc_id(player.multiplayer.get_unique_id(), player)
 	
 	player.bubble.emitting = !player.is_underwater_out
 

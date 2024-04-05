@@ -11,6 +11,7 @@ class_name GeneralMovementBody2D
 @export var sprite: NodePath
 
 var dir: int
+var is_activated: bool = false
 
 @onready var sprite_node: Node2D = get_node_or_null(sprite)
 
@@ -33,7 +34,8 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	motion_process(delta, slide)
+	if multiplayer.is_server() && is_activated:
+		motion_process(delta, slide)
 	if turn_sprite && sprite_node && is_instance_valid(sprite_node):
 		sprite_node.flip_h = speed.x < 0
 

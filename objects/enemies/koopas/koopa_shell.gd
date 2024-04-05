@@ -104,8 +104,8 @@ func _on_killing(target_enemy_attacked: Node, result: Dictionary) -> void:
 
 func _on_body_entered(player: Node2D) -> void:
 	if !stopping: return
-	if player != Thunder._current_player: return
-	if Thunder._current_player.warp > Player.Warp.NONE: return
+	if !player is Player: return
+	if player.warp > Player.Warp.NONE: return
 	if is_instance_valid(_delayer) || enemy_attacked.get_stomping_delayer(): return
 	status_swap(false)
 	sound()

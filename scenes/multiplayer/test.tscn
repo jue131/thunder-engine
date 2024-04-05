@@ -1,9 +1,10 @@
-[gd_scene load_steps=25 format=3 uid="uid://b4uiwm7rf0aca"]
+[gd_scene load_steps=31 format=3 uid="uid://b4uiwm7rf0aca"]
 
 [ext_resource type="Script" path="res://engine/scripts/classes/level/level.gd" id="1_6ktmn"]
 [ext_resource type="PackedScene" uid="uid://d3srfe2r6fg2u" path="res://engine/objects/core/music_loader/music_loader.tscn" id="2_7emf7"]
 [ext_resource type="PackedScene" uid="uid://1do11cr84k7y" path="res://engine/objects/players/mario/mario.tscn" id="4_d3uul"]
 [ext_resource type="Script" path="res://engine/objects/players/player_camera_2d.gd" id="6_vpesj"]
+[ext_resource type="Script" path="res://engine/scenes/multiplayer/player_spawner.gd" id="7_l1jf1"]
 [ext_resource type="Texture2D" uid="uid://da2cw2y41pju8" path="res://icon.svg" id="7_vu6hq"]
 [ext_resource type="PackedScene" uid="uid://b8kgbn8f7lvf0" path="res://engine/objects/items/coin/coin.tscn" id="8_d1um0"]
 [ext_resource type="PackedScene" uid="uid://ugxjxrdao5el" path="res://engine/components/hud/hud.tscn" id="8_vibsx"]
@@ -14,6 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://b7tkooebfam48" path="res://engine/objects/bumping_blocks/question_block/templates/Fire Flower Question Block.tscn" id="12_nqohq"]
 [ext_resource type="PackedScene" uid="uid://b71msw28e37a" path="res://engine/objects/powerups/red_mushroom/red_mushroom.tscn" id="13_imsc3"]
 [ext_resource type="PackedScene" uid="uid://bsdcxwngf5hru" path="res://engine/objects/powerups/fire_flower/fire_flower.tscn" id="14_r7cd0"]
+[ext_resource type="PackedScene" uid="uid://cno8qn60lpnvv" path="res://engine/objects/enemies/koopas/koopa_green.tscn" id="15_tke01"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_v0n81"]
 texture = ExtResource("7_vu6hq")
@@ -47,6 +49,48 @@ visi_y_sort_enabled = false
 custom_vars = {}
 
 [sub_resource type="Resource" id="Resource_1mlv7"]
+resource_local_to_scene = true
+script = ExtResource("10_qo42p")
+creation_nodepack = ExtResource("8_d1um0")
+trans_offset = Vector2(0, 0)
+trans_inheritances = 7
+trans_rotation = 0.0
+trans_scale = Vector2(1, 1)
+trans_skew = 0.0
+visi_z_index = 0
+visi_z_as_relative = true
+visi_y_sort_enabled = false
+custom_vars = {}
+
+[sub_resource type="Resource" id="Resource_htuqh"]
+resource_local_to_scene = true
+script = ExtResource("10_qo42p")
+creation_nodepack = ExtResource("8_d1um0")
+trans_offset = Vector2(0, 0)
+trans_inheritances = 7
+trans_rotation = 0.0
+trans_scale = Vector2(1, 1)
+trans_skew = 0.0
+visi_z_index = 0
+visi_z_as_relative = true
+visi_y_sort_enabled = false
+custom_vars = {}
+
+[sub_resource type="Resource" id="Resource_y5puo"]
+resource_local_to_scene = true
+script = ExtResource("10_qo42p")
+creation_nodepack = ExtResource("8_d1um0")
+trans_offset = Vector2(0, 0)
+trans_inheritances = 7
+trans_rotation = 0.0
+trans_scale = Vector2(1, 1)
+trans_skew = 0.0
+visi_z_index = 0
+visi_z_as_relative = true
+visi_y_sort_enabled = false
+custom_vars = {}
+
+[sub_resource type="Resource" id="Resource_xl8fm"]
 resource_local_to_scene = true
 script = ExtResource("10_qo42p")
 creation_nodepack = ExtResource("8_d1um0")
@@ -145,8 +189,24 @@ visi_z_as_relative = true
 visi_y_sort_enabled = false
 custom_vars = {}
 
+[sub_resource type="Resource" id="Resource_c1nso"]
+resource_local_to_scene = true
+script = ExtResource("10_qo42p")
+creation_fallback_node = ExtResource("13_imsc3")
+creation_nodepack = ExtResource("14_r7cd0")
+trans_offset = Vector2(0, 0)
+trans_inheritances = 7
+trans_rotation = 0.0
+trans_scale = Vector2(1, 1)
+trans_skew = 0.0
+visi_z_index = 0
+visi_z_as_relative = true
+visi_y_sort_enabled = false
+custom_vars = {}
+
 [node name="Test" type="Node2D"]
 script = ExtResource("1_6ktmn")
+metadata/_edit_lock_ = true
 
 [node name="MusicLoader" parent="." instance=ExtResource("2_7emf7")]
 
@@ -160,16 +220,31 @@ limit_left = 0
 limit_top = 0
 limit_bottom = 480
 script = ExtResource("6_vpesj")
+metadata/_edit_lock_ = true
 
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = SubResource("TileSet_04vis")
 format = 2
 layer_0/tile_data = PackedInt32Array(851970, 2, 0, 851971, 2, 0, 851972, 2, 0, 851973, 2, 0, 851974, 2, 0, 851975, 2, 0, 851976, 2, 0, 851977, 2, 0, 851978, 2, 0, 851979, 2, 0, 851980, 2, 0, 851981, 2, 0, 851982, 2, 0, 851983, 2, 0, 589842, 2, 0, 589843, 2, 0, 655379, 2, 0, 720915, 2, 0, 786451, 2, 0, 851987, 2, 0, 851986, 2, 0, 851985, 2, 0, 851984, 2, 0, 524296, 2, 0, 524295, 2, 0, 524294, 2, 0, 524293, 2, 0, 524292, 2, 0, 851969, 2, 0, 851968, 2, 0, 786445, 2, 0, 720909, 2, 0, 655374, 2, 0, 589838, 2, 0, 524307, 2, 0, 458771, 2, 0, 393235, 2, 0, 589840, 2, 0, 589841, 2, 0, 589844, 2, 0, 589845, 2, 0, 589846, 2, 0, 589847, 2, 0, 589848, 2, 0, 786457, 2, 0, 786458, 2, 0, 786459, 2, 0, 786460, 2, 0, 786461, 2, 0, 786462, 2, 0, 786463, 2, 0, 786464, 2, 0, 786465, 2, 0, 786466, 2, 0, 589855, 2, 0, 524320, 2, 0, 458785, 2, 0, 393250, 2, 0, 327715, 2, 0, 262180, 2, 0, 196645, 2, 0)
+metadata/_edit_lock_ = true
 
 [node name="HUD" parent="." instance=ExtResource("8_vibsx")]
 
 [node name="PlayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("res://engine/objects/players/mario/mp_mario.tscn")
+spawn_path = NodePath("../Players")
+script = ExtResource("7_l1jf1")
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="KoopaGreen" parent="Enemies" instance=ExtResource("15_tke01")]
+position = Vector2(560, 400)
+
+[node name="KoopaGreen2" parent="Enemies" instance=ExtResource("15_tke01")]
+position = Vector2(1200, 80)
+
+[node name="EnemySpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://engine/objects/enemies/koopas/koopa_green.tscn")
 spawn_path = NodePath("../Players")
 
 [node name="Brick" parent="." instance=ExtResource("10_uv86s")]
@@ -227,17 +302,17 @@ result = SubResource("Resource_1mlv7")
 
 [node name="QuestionBlock8" parent="." instance=ExtResource("9_5ljiy")]
 position = Vector2(48, 272)
-result = SubResource("Resource_1mlv7")
+result = SubResource("Resource_htuqh")
 initially_visible_and_solid = false
 
 [node name="QuestionBlock9" parent="." instance=ExtResource("9_5ljiy")]
 position = Vector2(16, 272)
-result = SubResource("Resource_1mlv7")
+result = SubResource("Resource_y5puo")
 initially_visible_and_solid = false
 
 [node name="QuestionBlock10" parent="." instance=ExtResource("9_5ljiy")]
 position = Vector2(80, 272)
-result = SubResource("Resource_1mlv7")
+result = SubResource("Resource_xl8fm")
 initially_visible_and_solid = false
 
 [node name="QuestionBlock3" parent="." instance=ExtResource("9_5ljiy")]
@@ -269,4 +344,4 @@ result = SubResource("Resource_xsk2q")
 
 [node name="QuestionBlockFireFlower2" parent="." instance=ExtResource("12_nqohq")]
 position = Vector2(944, 208)
-result = SubResource("Resource_xsk2q")
+result = SubResource("Resource_c1nso")

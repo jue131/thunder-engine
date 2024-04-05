@@ -10,6 +10,8 @@ var counter_enabled: bool = false
 
 
 func _physics_process(_delta):
+	if !is_multiplayer_authority():
+		return
 	super(_delta)
 	
 	var delta = Thunder.get_delta(_delta)
