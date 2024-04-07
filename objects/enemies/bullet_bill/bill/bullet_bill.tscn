@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://bw7f131nc4fhf"]
+[gd_scene load_steps=13 format=3 uid="uid://bw7f131nc4fhf"]
 
 [ext_resource type="Script" path="res://engine/scripts/nodes/general_movement/general_movement.gd" id="1_w3yqm"]
 [ext_resource type="Texture2D" uid="uid://c4ty5fuc65vlg" path="res://engine/objects/enemies/bullet_bill/bill/textures/bullet_bill.png" id="2_2h53c"]
@@ -28,6 +28,14 @@ custom_vars = {
 "death": NodePath("../../Sprite")
 }
 custom_script = ExtResource("4_ik838")
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_wyspk"]
+properties/0/path = NodePath(".:speed")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:position")
+properties/1/spawn = true
+properties/1/replication_mode = 1
 
 [node name="BulletBill" type="CharacterBody2D"]
 script = ExtResource("1_w3yqm")
@@ -77,6 +85,9 @@ texture = ExtResource("2_2h53c")
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
 modulate = Color(1, 1, 1, 0.0196078)
 rect = Rect2(-256, -256, 512, 512)
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_wyspk")
 
 [connection signal="killed_succeeded" from="Body/EnemyAttacked" to="." method="queue_free" flags=3]
 [connection signal="stomped_succeeded" from="Body/EnemyAttacked" to="." method="queue_free" flags=3]

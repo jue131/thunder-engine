@@ -1,57 +1,174 @@
-[gd_scene load_steps=3 format=3 uid="uid://dutax32ey1i8j"]
+[gd_scene load_steps=4 format=3 uid="uid://dutax32ey1i8j"]
 
 [ext_resource type="Script" path="res://engine/scenes/multiplayer/mp_layer.gd" id="1_masif"]
-[ext_resource type="FontFile" uid="uid://solby4jceqlq" path="res://engine/fonts/MisterEarlBT-Regular.otf" id="2_33btc"]
+[ext_resource type="FontFile" uid="uid://bkw5ynamtse2j" path="res://engine/fonts/misterearlbtrusbyme.otf" id="2_8p0cs"]
+[ext_resource type="Script" path="res://engine/scenes/multiplayer/chat_label.gd" id="3_mlnl2"]
 
 [node name="mp_layer" type="CanvasLayer"]
 layer = 3
 script = ExtResource("1_masif")
 
-[node name="Chat" type="Label" parent="."]
+[node name="ChatLabels" type="Node" parent="."]
+
+[node name="Chat0" type="Label" parent="ChatLabels"]
 self_modulate = Color(1, 1, 1, 0.5)
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 32.0
-offset_top = -128.0
+offset_top = -144.0
 offset_right = -32.0
-offset_bottom = 20.0
+offset_bottom = -116.0
 grow_horizontal = 2
 grow_vertical = 0
 scale = Vector2(1, 0.65)
 theme_override_colors/font_outline_color = Color(0, 0, 0.372549, 1)
 theme_override_constants/outline_size = 8
 theme_override_constants/line_spacing = 0
-theme_override_fonts/font = ExtResource("2_33btc")
+theme_override_fonts/font = ExtResource("2_8p0cs")
 theme_override_font_sizes/font_size = 22
-text = "1st
-2nd
-3rd
-4th
-5th"
+text = "1st"
 text_overrun_behavior = 1
+script = ExtResource("3_mlnl2")
+
+[node name="Chat1" type="Label" parent="ChatLabels"]
+self_modulate = Color(1, 1, 1, 0.5)
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = -126.0
+offset_right = -32.0
+offset_bottom = -98.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(1, 0.65)
+theme_override_colors/font_outline_color = Color(0, 0, 0.372549, 1)
+theme_override_constants/outline_size = 8
+theme_override_constants/line_spacing = 0
+theme_override_fonts/font = ExtResource("2_8p0cs")
+theme_override_font_sizes/font_size = 22
+text = "2nd"
+text_overrun_behavior = 1
+script = ExtResource("3_mlnl2")
+index = 1
+
+[node name="Chat2" type="Label" parent="ChatLabels"]
+self_modulate = Color(1, 1, 1, 0.5)
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = -108.0
+offset_right = -32.0
+offset_bottom = -80.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(1, 0.65)
+theme_override_colors/font_outline_color = Color(0, 0, 0.372549, 1)
+theme_override_constants/outline_size = 8
+theme_override_constants/line_spacing = 0
+theme_override_fonts/font = ExtResource("2_8p0cs")
+theme_override_font_sizes/font_size = 22
+text = "3rd"
+text_overrun_behavior = 1
+script = ExtResource("3_mlnl2")
+index = 2
+
+[node name="Chat3" type="Label" parent="ChatLabels"]
+self_modulate = Color(1, 1, 1, 0.5)
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = -90.0
+offset_right = -32.0
+offset_bottom = -62.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(1, 0.65)
+theme_override_colors/font_outline_color = Color(0, 0, 0.372549, 1)
+theme_override_constants/outline_size = 8
+theme_override_constants/line_spacing = 0
+theme_override_fonts/font = ExtResource("2_8p0cs")
+theme_override_font_sizes/font_size = 22
+text = "4th"
+text_overrun_behavior = 1
+script = ExtResource("3_mlnl2")
+index = 3
+
+[node name="Chat4" type="Label" parent="ChatLabels"]
+self_modulate = Color(1, 1, 1, 0.5)
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = -72.0
+offset_right = -32.0
+offset_bottom = -44.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(1, 0.65)
+theme_override_colors/font_outline_color = Color(0, 0, 0.372549, 1)
+theme_override_constants/outline_size = 8
+theme_override_constants/line_spacing = 0
+theme_override_fonts/font = ExtResource("2_8p0cs")
+theme_override_font_sizes/font_size = 22
+text = "5th"
+text_overrun_behavior = 1
+script = ExtResource("3_mlnl2")
+index = 4
+
+[node name="Chat5" type="Label" parent="ChatLabels"]
+self_modulate = Color(1, 1, 1, 0.5)
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = -54.0
+offset_right = -32.0
+offset_bottom = -26.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(1, 0.65)
+theme_override_colors/font_outline_color = Color(0, 0, 0.372549, 1)
+theme_override_constants/outline_size = 8
+theme_override_constants/line_spacing = 0
+theme_override_fonts/font = ExtResource("2_8p0cs")
+theme_override_font_sizes/font_size = 22
+text = "6th"
+text_overrun_behavior = 1
+script = ExtResource("3_mlnl2")
+index = 5
 
 [node name="Spectator" type="Label" parent="."]
+visible = false
 self_modulate = Color(1, 1, 1, 0.7)
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 48.0
-offset_top = -416.0
+offset_top = -426.0
 offset_right = -48.0
-offset_bottom = -318.0
+offset_bottom = -328.0
 grow_horizontal = 2
 grow_vertical = 0
 scale = Vector2(1, 0.75)
 theme_override_colors/font_outline_color = Color(0, 0, 0.372549, 1)
 theme_override_constants/outline_size = 8
-theme_override_constants/line_spacing = 0
-theme_override_fonts/font = ExtResource("2_33btc")
+theme_override_constants/line_spacing = -2
+theme_override_fonts/font = ExtResource("2_8p0cs")
 theme_override_font_sizes/font_size = 22
 text = "Spectating: %s
-Health: %d lives"
+Health: %d lives
+Press TAB to switch players"
 horizontal_alignment = 1
 text_overrun_behavior = 1
 
@@ -66,12 +183,19 @@ theme_override_colors/font_placeholder_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0.313726, 1)
 theme_override_colors/caret_color = Color(1, 1, 1, 1)
 theme_override_constants/outline_size = 8
-theme_override_constants/caret_width = 0
-theme_override_fonts/font = ExtResource("2_33btc")
+theme_override_constants/caret_width = 1
+theme_override_fonts/font = ExtResource("2_8p0cs")
 theme_override_font_sizes/font_size = 24
-placeholder_text = "Press Enter..."
+placeholder_text = "Enter..."
 flat = true
 caret_blink = true
+
+[node name="Lives" type="Label" parent="."]
+offset_left = 512.0
+offset_top = 64.0
+offset_right = 624.0
+offset_bottom = 256.0
+horizontal_alignment = 2
 
 [connection signal="focus_entered" from="EnterMsg" to="." method="_on_enter_msg_focus_entered"]
 [connection signal="focus_exited" from="EnterMsg" to="." method="_on_enter_msg_focus_exited"]

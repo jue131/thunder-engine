@@ -30,6 +30,8 @@ enum WarpDir {
 @export var suit: PlayerSuit = preload("res://engine/objects/players/prefabs/suits/mario/suit_mario_small.tres"):
 	set(to):
 		if (!to || suit.name == to.name) && !_force_suit: return
+		#if old_suit != suit || old_suit == null:
+		#	set_deferred("old_suit", suit)
 		suit = to.duplicate()
 		
 		if suit.animation_sprites:
@@ -50,8 +52,12 @@ enum WarpDir {
 		if _suit_appear:
 			_suit_appear = false
 			suit_appeared.emit()
-		Thunder._current_player_state = suit
-		suit_changed.emit(suit)
+		
+		if str(multiplayer.get_unique_id()) == str(name) || multiplayer.multiplayer_peer is OfflineMultiplayerPeer:
+			Thunder._current_player_state = suit
+		if _send_signal:
+			suit_changed.emit(suit)
+		push_warning(suit.name, multiplayer.get_unique_id())
 @export_group("Physics")
 @export_enum("Left: -1", "Right: 1") var direction: int = 1:
 	set(to):
@@ -98,6 +104,8 @@ var warp_dir: WarpDir
 
 var _force_suit: bool
 var _suit_appear: bool
+var _send_signal: bool
+var old_suit: PlayerSuit
 
 @warning_ignore("unused_private_class_variable")
 @onready var _is_ready: bool = true
@@ -188,12 +196,20 @@ func control_process() -> void:
 	is_crouching = inputs.is_crouching
 
 
-func change_suit(to: PlayerSuit, appear: bool = true, forced: bool = false) -> void:
+@rpc("any_peer", "call_local", "reliable")
+func change_suit(to: PlayerSuit, appear: bool = true, forced: bool = false, send_signal: bool = true) -> void:
 	_force_suit = forced
 	_suit_appear = appear
+	_send_signal = send_signal
 	suit = to
 	_force_suit = false
 	_suit_appear = false
+	_send_signal = false
+
+
+## Compare current player power with [member power]
+func is_player_power(power: Data.PLAYER_POWER) -> bool:
+	return suit && suit.type == power
 
 
 #= Status
@@ -218,7 +234,7 @@ func hurt(tags: Dictionary = {}) -> void:
 	if warp != Warp.NONE: return
 	
 	if suit.gets_hurt_to:
-		change_suit(suit.gets_hurt_to)
+		change_suit.rpc_id(multiplayer.get_unique_id(), suit.gets_hurt_to)
 		invincible(tags.get(&"hurt_duration", 2))
 		Audio.play_sound(suit.sound_hurt, self, false, {pitch = suit.sound_pitch})
 	else:
@@ -229,7 +245,7 @@ func hurt(tags: Dictionary = {}) -> void:
 
 var is_dying: bool = false
 func die(tags: Dictionary = {}) -> void:
-	if warp != Warp.NONE: return
+	if warp != Warp.NONE && !"force_death" in tags: return
 	if is_dying: return
 	is_dying = true
 	
@@ -246,6 +262,7 @@ func die(tags: Dictionary = {}) -> void:
 			func(db: Node2D) -> void:
 				db.wait_time = death_wait_time
 				db.check_for_lives = death_check_for_lives
+				db.p_id = 1
 				if death_sprite:
 					var dsdup: Node2D = death_sprite.duplicate()
 					db.add_child(dsdup)
@@ -253,7 +270,8 @@ func die(tags: Dictionary = {}) -> void:
 		).create_2d()
 	
 	died.emit()
-	queue_free()
+	if is_multiplayer_authority():
+		queue_free()
 
 
 func is_invincible() -> bool:

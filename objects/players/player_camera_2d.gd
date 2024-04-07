@@ -20,8 +20,13 @@ func _physics_process(_delta):
 func teleport() -> void:
 	if !is_current(): return
 	var player: Player = Thunder._current_player
-	if !par is PathFollow2D && player:
-		global_position = Vector2(Thunder._current_player.global_position)
+	if !par is PathFollow2D:
+		if player:
+			global_position = Vector2(player.global_position)
+		elif Multiplayer.online_play:
+			for i in get_tree().get_nodes_in_group(&"Player"):
+				if Multiplayer.currently_spectating == str(i.name).to_int():
+					global_position = Vector2(i.global_position)
 	
 	if par is PathFollow2D:
 		if player && !stop_blocking_edges:

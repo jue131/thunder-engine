@@ -14,17 +14,22 @@ signal game_over_finished
 func _ready() -> void:
 	Thunder._current_hud = self
 	
-	timer.timeout.connect(func() -> void:
-		if !Thunder._current_player: return
-		if Data.values.time < 0: return
-		
-		Data.values.time -= 1
-		
-		if Data.values.time == 100:
-			timer_hurry()
-		elif Data.values.time == 0:
-			Thunder._current_player.die()
-	)
+	if multiplayer.is_server():
+		timer.timeout.connect(func() -> void:
+			if !get_tree().get_first_node_in_group(&"Player"): return
+			if Data.values.time < 0: return
+			
+			Data.values.time -= 1
+			
+			if Data.values.time == 100:
+				timer_hurry()
+			elif Data.values.time == 0:
+				Multiplayer.all_players_died.rpc()
+			Multiplayer.level_time = Data.values.time
+		)
+	else:
+		timer.stop()
+		Data.values.time = Multiplayer.level_time
 	
 	await get_tree().physics_frame
 	if Data.values.time < 0:

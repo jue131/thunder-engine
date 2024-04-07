@@ -101,7 +101,8 @@ func add_lives(count: int):
 		return
 	
 	Data.values.lives += count
-	ScoreTextLife.new("%sUP" % count, _current_player)
+	if _current_player:
+		ScoreTextLife.new("%sUP" % count, _current_player)
 
 
 ## Add scores for [member _current_player][br]
@@ -115,11 +116,6 @@ func add_score(count: int):
 	
 	Data.values.score += count
 	ScoreText.new(str(count), _current_player)
-
-
-## Compare current player power with [member power]
-func is_player_power(power: Data.PLAYER_POWER) -> bool:
-	return _current_player_state && _current_player_state.type == power
 
 
 ## Pauses game

@@ -49,7 +49,7 @@ func _physics_process(delta: float) -> void:
 		
 		var overlaps: bool = body.overlaps_body(player)
 		if overlaps && !one_overlap:
-			collect.rpc_id(str(player.name).to_int())
+			collect.rpc_id(str(player.name).to_int(), player)
 		if !overlaps && one_overlap:
 			one_overlap = false
 
@@ -60,12 +60,13 @@ func appear_process(delta: float) -> void:
 	position -= Vector2(0, appear_speed).rotated(global_rotation) * delta
 
 
-@rpc("call_local")
-func collect() -> void:
-	_change_state_logic(force_powerup_state)
+@rpc("any_peer", "call_local", "reliable")
+func collect(player: Player) -> void:
+	_change_state_logic(force_powerup_state, player)
 	
 	if supply_behavior:
-		Data.values.lives = ProjectSettings.get("application/thunder_settings/player/default_lives") + supply_modify_lives
+		if multiplayer.get_remote_sender_id() == str(player.name).to_int():
+			Data.values.lives = ProjectSettings.get("application/thunder_settings/player/default_lives") + supply_modify_lives
 		one_overlap = true
 		return
 	
@@ -73,14 +74,15 @@ func collect() -> void:
 		ScoreText.new(str(score), self)
 		Data.values.score += score
 	
-	queue_free()
+	set_physics_process(false)
+	visible = false
+	#queue_free()
 
 
-func _change_state_logic(force_powerup: bool) -> void:
-	var player: Player = Thunder._current_player
+func _change_state_logic(force_powerup: bool, player) -> void:
 	var to: PlayerSuit = to_suit[player.character]
 	if force_powerup:
-		if to.name != Thunder._current_player_state.name:
+		if to.name != player.suit.name:
 			player.change_suit(to)
 			Audio.play_sound(pickup_powerup_sound, self, false, {pitch = sound_pitch})
 		else:
@@ -88,12 +90,12 @@ func _change_state_logic(force_powerup: bool) -> void:
 		return
 	
 	if (
-		to.type > Thunder._current_player_state.type || (
-			to.name != Thunder._current_player_state.name && 
-			to.type == Thunder._current_player_state.type
+		to.type > player.suit.type || (
+			to.name != player.suit.name && 
+			to.type == player.suit.type
 		)
 	):
-		if Thunder._current_player_state.type < to.type - 1:
+		if player.suit.type < to.type - 1:
 			player.change_suit(to.gets_hurt_to)
 		else:
 			player.change_suit(to)

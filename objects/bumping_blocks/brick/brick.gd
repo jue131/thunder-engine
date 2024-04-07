@@ -30,33 +30,34 @@ func bricks_break() -> void:
 		)
 			
 	Data.values.score += 10
-	queue_free()
+	if is_multiplayer_authority():
+		queue_free()
 
 
 @rpc("any_peer", "call_local", "reliable")
-func got_bumped(by: Node2D) -> void:
+func got_bumped(is_small: bool) -> void:
 	if _triggered: return
-	if by is Player:
-		if (by.is_on_floor() && !by.is_crouching) || by.warp != Player.Warp.NONE:
-			return
+	#if by is Player:
+	#	if (by.is_on_floor() && !by.is_crouching) || by.warp != Player.Warp.NONE:
+	#		return
 			
 	# Brick with some result
 	if result && result.creation_nodepack:
-		brick_bump_logic.rpc()
+		brick_bump_logic.rpc_id(multiplayer.get_remote_sender_id(), is_small)
 		return
 	
 	# Standard brick
-	if by is Player && by.suit.type == Data.PLAYER_POWER.SMALL:
-		bump.rpc(false)
+	if is_small:
+		bump.rpc_id(multiplayer.get_remote_sender_id(), false, 0, true)
 	else:
 		hit_attack()
 		bricks_break()
 	
 
 @rpc("any_peer", "call_local", "reliable")
-func brick_bump_logic() -> void:
+func brick_bump_logic(is_small) -> void:
 	if result_counter_value < 1: return
-	bump.rpc(false)
+	bump.rpc_id(multiplayer.get_remote_sender_id(), false, 0, is_small)
 	if result && !counter_enabled:
 		counter_enabled = true
 	

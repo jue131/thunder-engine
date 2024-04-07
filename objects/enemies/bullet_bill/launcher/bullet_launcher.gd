@@ -25,6 +25,11 @@ func _ready() -> void:
 
 
 func _on_bullet_launched() -> void:
+	if is_multiplayer_authority():
+		_mp_bullet_launched.rpc()
+
+@rpc("call_local", "reliable")
+func _mp_bullet_launched() -> void:
 	var player: Player = Thunder._current_player
 	if !player:
 		interval.start(0.1)

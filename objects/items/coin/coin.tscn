@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://b8kgbn8f7lvf0"]
+[gd_scene load_steps=15 format=3 uid="uid://b8kgbn8f7lvf0"]
 
 [ext_resource type="Script" path="res://engine/objects/items/coin/coin.gd" id="1_exjvk"]
 [ext_resource type="Texture2D" uid="uid://cv4ajosu5y5xl" path="res://engine/objects/items/coin/texture.png" id="1_mcj00"]
@@ -63,6 +63,11 @@ visi_y_sort_enabled = false
 custom_vars = {}
 custom_script = SubResource("GDScript_twjsq")
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_kxaop"]
+properties/0/path = NodePath(".:visible")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+
 [node name="Coin" type="Area2D" groups=["coin"]]
 collision_layer = 4
 collision_mask = 5
@@ -103,5 +108,8 @@ killing_immune = {
 killing_creation = SubResource("Resource_223t5")
 killing_sound_succeeded = ExtResource("6_v73xb")
 turn_into_coin_on_level_end = false
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_kxaop")
 
 [connection signal="killed_succeeded" from="Body/EnemyAttacked" to="." method="queue_free"]

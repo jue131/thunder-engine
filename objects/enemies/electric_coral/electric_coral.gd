@@ -5,6 +5,6 @@ extends AnimatableBody2D
 
 func _ready() -> void:
 	area_2d.body_entered.connect(func(body: Node2D) -> void:
-		if body == Thunder._current_player:
+		if body is Player:
 			body.hurt()
 	)

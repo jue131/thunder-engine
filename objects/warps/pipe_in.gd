@@ -103,7 +103,8 @@ func _physics_process(delta: float) -> void:
 			player.z_index = -5
 			player.speed = Vector2.ZERO
 			Audio.play_sound(warping_sound, self, false)
-			Thunder._current_hud.timer.paused = true
+			if !Multiplayer.online_play:
+				Thunder._current_hud.timer.paused = true
 	
 	if !_on_warp: return
 	
@@ -196,13 +197,13 @@ func _label() -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if Engine.is_editor_hint(): return
-	if body == Thunder._current_player:
+	if body is Player:
 		player = body
 		player_enter.emit()
 
 func _on_body_exited(body: Node2D) -> void:
 	if Engine.is_editor_hint(): return
-	if body == Thunder._current_player && !_on_warp:
+	if body is Player && !_on_warp:
 		player = null
 		player_exit.emit()
 

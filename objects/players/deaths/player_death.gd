@@ -8,6 +8,7 @@ var circle_opening_speed: float = 0.1
 
 var movement: bool
 var animation_only: bool = false
+var p_id: int
 
 @onready var game_over_music: AudioStream = load(ProjectSettings.get_setting("application/thunder_settings/player/gameover_music"))
 
@@ -17,11 +18,15 @@ func _ready() -> void:
 	
 	movement = true
 	vel_set_y(-550)
-	if animation_only:
+	
+	if animation_only && !multiplayer.is_server():
 		return
 	
 	if wait_time > 0.0:
 		await get_tree().create_timer(wait_time, false, true).timeout
+	
+	#if !p_id:
+	#	return
 	
 	# After death
 	if check_for_lives:
@@ -31,44 +36,45 @@ func _ready() -> void:
 					Thunder._current_hud.game_over()
 					Audio.play_music(game_over_music, 1, { "ignore_pause": true }, false, false)
 			else:
-				Multiplayer.spectators.append(multiplayer.get_unique_id())
+				
+				Multiplayer.spectators.append(p_id)
 			return
+	
+	if multiplayer.is_server():
+		Multiplayer.respawn_player.rpc(p_id)
+	
+	if animation_only: return
+	
 	Thunder._current_player_state = null
 	Data.values.lives -= 1
 	Data.values.onetime_blocks = false
 	
-	# Transition
-	TransitionManager.accept_transition(
-	load("res://engine/components/transitions/circle_transition/circle_transition.tscn")
-		.instantiate()
-		.with_speeds(circle_closing_speed, -circle_opening_speed)
-	)
-	
-	var cam: Camera2D = Thunder._current_camera
-	var marker: Marker2D
-	if cam:
-		var cam_pos = cam.get_screen_center_position()
-		marker = Marker2D.new()
-		marker.position = Vector2(
-			global_position.x,
-			clamp(global_position.y, cam_pos.y - 248, cam_pos.y + 248)
-		)
-		Scenes.current_scene.add_child(marker)
-	
-	TransitionManager.current_transition.on(marker) # Supports a Node2D or a Vector2
 	if !Multiplayer.online_play:
+		# Transition
+		TransitionManager.accept_transition(
+		load("res://engine/components/transitions/circle_transition/circle_transition.tscn")
+			.instantiate()
+			.with_speeds(circle_closing_speed, -circle_opening_speed)
+		)
+		
+		var cam: Camera2D = Thunder._current_camera
+		var marker: Marker2D
+		if cam:
+			var cam_pos = cam.get_screen_center_position()
+			marker = Marker2D.new()
+			marker.position = Vector2(
+				global_position.x,
+				clamp(global_position.y, cam_pos.y - 248, cam_pos.y + 248)
+			)
+			Scenes.current_scene.add_child(marker)
+		
+		TransitionManager.current_transition.on(marker) # Supports a Node2D or a Vector2
 		TransitionManager.transition_middle.connect(func():
 			TransitionManager.current_transition.paused = true
 			Scenes.reload_current_scene()
 		, CONNECT_ONE_SHOT | CONNECT_DEFERRED)
 	else:
-		await TransitionManager.transition_middle
-		Multiplayer.respawn_player.rpc_id(multiplayer.get_unique_id())
-		TransitionManager.current_transition.paused = true
-		marker.position = Multiplayer.spawn_pos
-		await get_tree().physics_frame
-		TransitionManager.current_transition.on(marker)
-		TransitionManager.current_transition.paused = false
+		Multiplayer.make_player_visible.rpc(multiplayer.get_unique_id())
 
 
 func _physics_process(delta: float) -> void:

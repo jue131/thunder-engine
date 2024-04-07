@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://b4uiwm7rf0aca"]
+[gd_scene load_steps=32 format=3 uid="uid://b4uiwm7rf0aca"]
 
 [ext_resource type="Script" path="res://engine/scripts/classes/level/level.gd" id="1_6ktmn"]
 [ext_resource type="PackedScene" uid="uid://d3srfe2r6fg2u" path="res://engine/objects/core/music_loader/music_loader.tscn" id="2_7emf7"]
@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://b71msw28e37a" path="res://engine/objects/powerups/red_mushroom/red_mushroom.tscn" id="13_imsc3"]
 [ext_resource type="PackedScene" uid="uid://bsdcxwngf5hru" path="res://engine/objects/powerups/fire_flower/fire_flower.tscn" id="14_r7cd0"]
 [ext_resource type="PackedScene" uid="uid://cno8qn60lpnvv" path="res://engine/objects/enemies/koopas/koopa_green.tscn" id="15_tke01"]
+[ext_resource type="PackedScene" uid="uid://dt52xvrtre8h3" path="res://engine/objects/enemies/piranha_plants/piranha_head.tscn" id="17_ebhyn"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_v0n81"]
 texture = ExtResource("7_vu6hq")
@@ -345,3 +346,6 @@ result = SubResource("Resource_xsk2q")
 [node name="QuestionBlockFireFlower2" parent="." instance=ExtResource("12_nqohq")]
 position = Vector2(944, 208)
 result = SubResource("Resource_c1nso")
+
+[node name="PiranhaHead" parent="." instance=ExtResource("17_ebhyn")]
+position = Vector2(208, 400)

@@ -7,7 +7,14 @@ extends Player
 func _enter_tree() -> void:
 	set_multiplayer_authority(str(name).to_int())
 
+
+
 func _ready() -> void:
+	if !suit_changed.is_connected(_suit_changed):
+		suit_changed.connect(_suit_changed)
+	#if !died.is_connected(Multiplayer.player_died.bind(self)):
+	#	died.connect(Multiplayer.player_died.bind(self))
+	
 	_initiate_transition()
 	
 	if !Thunder._current_player_state:
@@ -15,7 +22,10 @@ func _ready() -> void:
 	else:
 		suit = Thunder._current_player_state
 	
-	change_suit(suit, false, true)
+	change_suit.rpc_id(multiplayer.get_unique_id(), suit, false, true)
+	
+	if Data.values.lives == -1 && death_check_for_lives:
+		Data.values.lives = ProjectSettings.get_setting("application/thunder_settings/player/default_lives", 4)
 	
 	if str(multiplayer.get_unique_id()) == str(name):
 		Thunder._current_player = self
@@ -23,9 +33,6 @@ func _ready() -> void:
 	
 	if !is_starman():
 		sprite.material.set_shader_parameter(&"mixing", false)
-	
-	if Data.values.lives == -1 && death_check_for_lives:
-		Data.values.lives = ProjectSettings.get_setting("application/thunder_settings/player/default_lives", 4)
 	
 	if synced_position:
 		global_position = synced_position
@@ -64,8 +71,20 @@ func set_player_name(value: String) -> void:
 
 
 func die(tags: Dictionary = {}) -> void:
-	if str(name).to_int() != multiplayer.get_unique_id():
+	if !is_multiplayer_authority():
 		return
 	
+	Multiplayer.player_died.rpc(str(name).to_int())
+	Multiplayer.chat_message.emit("You died!")
 	super(tags)
 	
+
+func _suit_changed(_suit: PlayerSuit) -> void:
+	mp_change_suit.rpc_id(multiplayer.get_unique_id(), _suit) #rpc_id(multiplayer.get_unique_id(), _suit)
+
+@rpc("any_peer", "call_local", "reliable")
+func mp_change_suit(_suit: PlayerSuit) -> void:
+	push_warning('bro changed suit')
+	#if str(multiplayer.get_remote_sender_id()) == str(name): return
+	if _suit == null: return
+	change_suit(suit, false, false, false)

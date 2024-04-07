@@ -26,25 +26,25 @@ func _ready():
 
 
 func _on_host_pressed():
-	if connect_name.text == "":
-		error_label.text = "Invalid name!"
-		return
+	var err = name_check(connect_name.text)
+	if err: return
+	
+	var player_name = connect_name.text
+	var ok = Multiplayer.host_game(player_name)
+	if !ok: return
 
 	connect.hide()
 	players.show()
 	error_label.text = ""
 
-	var player_name = connect_name.text
-	Multiplayer.host_game(player_name)
 	#if ok:
 	#	Multiplayer.begin_game()
 	refresh_lobby()
 
 
 func _on_join_pressed():
-	if connect_name.text == "":
-		error_label.text = "Invalid name!"
-		return
+	var err = name_check(connect_name.text)
+	if err: return
 
 	var ip = ip_address.text
 	if !ip.is_valid_ip_address():
@@ -59,6 +59,13 @@ func _on_join_pressed():
 	timer.start()
 	timer.timeout.connect(_on_connection_failed)
 	Multiplayer.join_game(ip, player_name)
+
+
+func name_check(new_name: String) -> bool:
+	if new_name == "" || "%" in new_name:
+		error_label.text = "Invalid name!"
+		return true
+	return false
 
 
 func _on_connection_success():
@@ -92,7 +99,7 @@ func refresh_lobby():
 	var player_list = Multiplayer.get_player_list()
 	player_list.sort()
 	list.clear()
-	list.add_item(Multiplayer.get_player_name() + " (You)")
+	list.add_item(Multiplayer.player_name + " (You)")
 	for p in player_list:
 		list.add_item(p)
 

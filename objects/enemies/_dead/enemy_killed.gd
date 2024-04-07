@@ -8,6 +8,7 @@ var _rotating_dir: int
 
 func _ready() -> void:
 	# Sprite setting
+	is_activated = true
 	(func():
 		if !sprite_node:
 			for i in get_children():

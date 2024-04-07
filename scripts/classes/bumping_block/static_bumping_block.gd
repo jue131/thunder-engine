@@ -83,9 +83,8 @@ func _editor_process() -> void:
 ## Make the block bumped. If the block was just now got or is being bumped, then nothing will happen[br]
 ## If [code]disable[/code] is [code]true[/code], then all cast detectors will be disabled[br]
 ## [code]bump_rotation[/code] is the direction angle that the block moves when it is being bumped[br]
-## [code]interrupy[/code] no usge currently
 @rpc("any_peer", "call_local", "reliable")
-func bump(disable: bool, bump_rotation: float = 0, interrupt: bool = false):
+func bump(disable: bool, bump_rotation: float = 0, is_small: bool = false):
 	if _triggered: return
 	if !active: return
 	
@@ -104,7 +103,7 @@ func bump(disable: bool, bump_rotation: float = 0, interrupt: bool = false):
 	tw.tween_callback(_lt.bind(disable))
 	
 	if result:
-		call_deferred(&"_creation", result.prepare())
+		call_deferred(&"_creation", result.prepare(is_small))
 		result_appeared.emit()
 	else:
 		Audio.play_sound(bump_sound, self)

@@ -3,8 +3,6 @@ extends Powerup
 @export var starman_duration: float = 10
 @export var starman_music: Resource = preload("res://engine/objects/powerups/super_star/music-starman.it")
 
-var player = Thunder._current_player
-
 func _physics_process(delta: float) -> void:
 	super(delta)
 	if is_on_floor():
@@ -12,7 +10,7 @@ func _physics_process(delta: float) -> void:
 	if !appear_distance:
 		$Sprite.speed_scale = 5
 
-func collect() -> void:
+func collect(player: Player) -> void:
 	if appear_distance: return
 	
 	if score > 0:

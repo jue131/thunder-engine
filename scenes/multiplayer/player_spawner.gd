@@ -7,7 +7,9 @@ func _enter_tree() -> void:
 func _on_spawn(node: Node) -> void:
 	if !node is Player: return
 	if node.name == "1": return
-	node.set_player_name(Multiplayer.player_name)
+	if node.name == str(multiplayer.get_unique_id()):
+		node.set_player_name(Multiplayer.player_name)
+	else:
+		node.set_player_name(Multiplayer.players[str(node.name).to_int()])
 	node.synced_position = Multiplayer.spawn_pos
 	node.position = Multiplayer.spawn_pos
-	print(Multiplayer.spawn_pos)

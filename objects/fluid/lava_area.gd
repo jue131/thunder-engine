@@ -7,7 +7,7 @@ func _ready() -> void:
 	# Body in/out of water
 	body_entered.connect(
 		func(body: Node2D) -> void:
-			if body == Thunder._current_player:
+			if body is Player:
 				body.die()
 			if body.is_in_group(&"#lava_body"):
 				self._spray.call_deferred(body, Vector2.ZERO)
