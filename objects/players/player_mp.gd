@@ -9,12 +9,6 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:
-	#if !suit_changed.is_connected(_suit_changed):
-	#	suit_changed.connect(_suit_changed)
-	#if !died.is_connected(Multiplayer.player_died.bind(self)):
-	#	died.connect(Multiplayer.player_died.bind(self))
-	#multiplayer.allow_object_decoding = true
-	
 	_initiate_transition()
 	
 	if str(multiplayer.get_unique_id()) == str(name):
@@ -91,20 +85,7 @@ func die(tags: Dictionary = {}) -> void:
 	Multiplayer.game.player_died.rpc(str(name).to_int())
 	Multiplayer.game.chat_message.emit("You died!")
 	super(tags)
-	
 
-#func _suit_changed(_suit: PlayerSuit) -> void:
-#	mp_change_suit.rpc_id(multiplayer.get_unique_id(), _suit) #rpc_id(multiplayer.get_unique_id(), _suit)
-
-#@rpc("any_peer", "call_local", "reliable")
-#func mp_change_suit(_suit: String, appear: bool = true, forced: bool = false, send_signal: bool = true, extra_flags: Dictionary = {}) -> void:
-#	push_warning('bro changed suit')
-#	#if str(multiplayer.get_remote_sender_id()) == str(name): return
-#	var suit_scene = load(_suit).instantiate()
-#	if !is_instance_valid(suit_scene) || !suit_scene is PlayerSuitScene:
-#		suit_scene = player_suit
-#	change_suit(suit_scene, appear, forced, send_signal, extra_flags)
-#rpc_id(multiplayer.get_remote_sender_id(), 
 
 @rpc("any_peer", "call_local", "reliable")
 func change_suit(to: Variant, appear: bool = true, forced: bool = false, send_signal: bool = true, extra_flags: Dictionary = {}) -> void:

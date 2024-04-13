@@ -26,12 +26,12 @@ func _physics_process(delta):
 @rpc("any_peer", "call_local", "reliable")
 func got_bumped(is_small: bool) -> void:
 	if _triggered: return
-	call_bump.rpc_id(multiplayer.get_remote_sender_id(), is_small)
+	call_bump.rpc(is_small)
 
 
 @rpc("any_peer", "call_local", "reliable")
 func call_bump(is_small: bool) -> void:
-	bump.rpc_id(multiplayer.get_remote_sender_id(), true, 0, is_small)
+	bump.rpc(true, 0, is_small)
 	_animated_sprite_2d.animation = &"empty"
 
 

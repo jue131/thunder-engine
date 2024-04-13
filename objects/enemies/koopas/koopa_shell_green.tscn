@@ -151,8 +151,8 @@ metadata/_edit_lock_ = true
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_xmimy")
 
-[connection signal="collided_wall" from="." to="." method="_on_collided_wall"]
 [connection signal="collided_wall" from="." to="." method="turn_x"]
+[connection signal="collided_wall" from="." to="." method="_on_collided_wall"]
 [connection signal="body_entered" from="Body" to="." method="_on_body_entered"]
 [connection signal="killed_succeeded" from="Body/EnemyAttacked" to="." method="queue_free" flags=3]
 [connection signal="killed_succeeded" from="Body/EnemyAttacked" to="Sprite" method="set_frame" binds= [0]]

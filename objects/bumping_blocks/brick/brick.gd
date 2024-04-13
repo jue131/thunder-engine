@@ -31,7 +31,7 @@ func bricks_break() -> void:
 			
 	Data.values.score += 10
 	if is_multiplayer_authority():
-		queue_free()
+		Multiplayer._free.rpc(get_path())
 
 
 @rpc("any_peer", "call_local", "reliable")
@@ -43,12 +43,12 @@ func got_bumped(is_small: bool) -> void:
 			
 	# Brick with some result
 	if result && result.creation_nodepack:
-		brick_bump_logic.rpc_id(multiplayer.get_remote_sender_id(), is_small)
+		brick_bump_logic.rpc(is_small)
 		return
 	
 	# Standard brick
 	if is_small:
-		bump.rpc_id(multiplayer.get_remote_sender_id(), false, 0, true)
+		bump.rpc(false, 0, true)
 	else:
 		hit_attack()
 		bricks_break()
@@ -57,7 +57,7 @@ func got_bumped(is_small: bool) -> void:
 @rpc("any_peer", "call_local", "reliable")
 func brick_bump_logic(is_small) -> void:
 	if result_counter_value < 1: return
-	bump.rpc_id(multiplayer.get_remote_sender_id(), false, 0, is_small)
+	bump.rpc(false, 0, is_small)
 	if result && !counter_enabled:
 		counter_enabled = true
 	

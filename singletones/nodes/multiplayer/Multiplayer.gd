@@ -28,11 +28,12 @@ var player_name = "Mario"
 var players = {}
 var players_ready = []
 
-@export var initial_scene: String = "res://engine/scenes/multiplayer/test.tscn"
+@export_file("*.tscn", "*.scn") var initial_scene: String = "res://engine/scenes/multiplayer/test.tscn"
 #var pending_scene: String = "res://engine/scenes/save_game_room/save_game_room_template.tscn"
 var fallback_scene: String = "res://engine/scenes/multiplayer/empty.tscn"
 
 @onready var game: Node = $MPGame
+@onready var net: Node = $Net
 
 # Signals to let lobby GUI know what's going on.
 signal player_list_changed()
@@ -253,3 +254,11 @@ func end_game() -> void:
 	online_play = false
 	if is_instance_valid(mp_layer):
 		mp_layer.queue_free()
+
+
+@rpc("authority", "call_local", "reliable")
+func _free(node_path: NodePath) -> void:
+	if !node_path: return
+	var node = get_node_or_null(node_path)
+	if is_instance_valid(node):
+		node.queue_free()
