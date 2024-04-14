@@ -24,12 +24,12 @@ func _ready() -> void:
 			if Data.values.time == 100:
 				timer_hurry()
 			elif Data.values.time == 0:
-				Multiplayer.all_players_died.rpc()
-			Multiplayer.level_time = Data.values.time
+				Multiplayer.game.all_players_died.rpc()
+			Multiplayer.game.level_time = Data.values.time
 		)
 	else:
 		timer.stop()
-		Data.values.time = Multiplayer.level_time
+		Data.values.time = Multiplayer.game.level_time
 	
 	await get_tree().physics_frame
 	if Data.values.time < 0:

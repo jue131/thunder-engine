@@ -70,8 +70,8 @@ func _hurt_player() -> void:
 		elif ins is Player:
 			if (
 				"suit" in ins && ins.suit &&
-				"behavior_crouch_reflect_fireballs" in ins.suit &&
-				ins.suit.behavior_crouch_reflect_fireballs == true &&
+				"crouch_reflect_fireballs" in ins.player_suit.behavior_script &&
+				ins.player_suit.behavior_script._crouch_reflect_fireballs == true &&
 				ins.is_crouching == true
 			):
 				damaged_player_failed.emit()

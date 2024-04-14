@@ -1,8 +1,8 @@
-[gd_scene load_steps=9 format=3 uid="uid://b71msw28e37a"]
+[gd_scene load_steps=10 format=3 uid="uid://b71msw28e37a"]
 
 [ext_resource type="Script" path="res://engine/objects/powerups/powerup.gd" id="1_s8ya2"]
-[ext_resource type="Resource" uid="uid://cmhi4m24voa1d" path="res://engine/objects/players/prefabs/suits/mario/suit_mario_super.tres" id="2_1tqft"]
 [ext_resource type="Texture2D" uid="uid://81bpmrtqxli8" path="res://engine/objects/powerups/red_mushroom/texture.png" id="2_crlg7"]
+[ext_resource type="PackedScene" uid="uid://ckpaa06bwh02o" path="res://engine/objects/players/prefabs/suits/mario/super_mario_suit.tscn" id="2_ixj5j"]
 [ext_resource type="Script" path="res://engine/scripts/nodes/vision/vision.gd" id="3_ccgfb"]
 [ext_resource type="Script" path="res://engine/scripts/classes/effecters/point_light_2d_appear.gd" id="5_s7dmu"]
 
@@ -21,6 +21,14 @@ fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(0.8, 0.1)
 metadata/_snap_enabled = true
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_xn2ty"]
+properties/0/path = NodePath(".:speed")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:position")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+
 [node name="RedMushroom" type="CharacterBody2D"]
 collision_layer = 4
 collision_mask = 64
@@ -29,7 +37,7 @@ floor_max_angle = 0.837758
 floor_snap_length = 20.0
 script = ExtResource("1_s8ya2")
 to_suit = {
-"Mario": ExtResource("2_1tqft")
+"Mario": ExtResource("2_ixj5j")
 }
 speed = Vector2(100, 0)
 gravity_scale = 0.5
@@ -64,4 +72,5 @@ texture = SubResource("GradientTexture2D_cmgen")
 script = ExtResource("5_s7dmu")
 duration = 0.3
 
-[connection signal="collided_wall" from="." to="." method="turn_x"]
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_xn2ty")

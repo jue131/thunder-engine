@@ -8,10 +8,7 @@ const DEFAULT_PORT = 14210
 # Max number of players.
 const MAX_PEERS = 4
 
-const PLAYER = preload("res://engine/objects/players/mario/mp_mario.tscn")
 const MP_LAYER = preload("res://engine/scenes/multiplayer/mp_layer.tscn")
-var chat: Array[String] = ["","","","","",""]
-var entering_message: bool = false
 
 var mp_layer: CanvasLayer: # Reference to the current player
 	set(node):
@@ -20,35 +17,9 @@ var mp_layer: CanvasLayer: # Reference to the current player
 	get:
 		if !is_instance_valid(mp_layer): return null
 		return mp_layer
-@onready var sync_node: MultiplayerSynchronizer = $MultiplayerSynchronizer
 
 var peer = null
-var open_for_connections: bool = true
 var online_play: bool = false
-
-var default_lives: int = ProjectSettings.get_setting("application/thunder_settings/player/default_lives", 4)
-@export var player_data: Dictionary = { 1: [
-	default_lives,
-	Thunder._current_player_state
-] }:
-	set(new_data):
-		if player_data.hash() == new_data.hash():
-			return
-		player_data = new_data.duplicate()
-		player_data_changed.emit()
-
-@export var level_time: int:
-	set(new_time):
-		if !Scenes.current_scene is Level:
-			return
-		level_time = new_time
-		if !multiplayer.is_server():
-			Data.values.time = new_time
-@export var coins: int:
-	set(new):
-		coins = new
-		if !multiplayer.is_server():
-			Data.values.coins = coins
 
 # Name for my player.
 var player_name = "Mario"
@@ -57,29 +28,11 @@ var player_name = "Mario"
 var players = {}
 var players_ready = []
 
-# Player spectators.
-var spectators: Array:
-	set(new_array):
-		spectators = new_array
-		if !mp_layer: return
-		if str(multiplayer.get_unique_id()) in spectators:
-			if currently_spectating in spectators:
-				switch_spectating_player()
-			start_spectating()
-			return
-		if new_array.size() > 0:
-			mp_layer.spectator.text = str(new_array.size()) + " players spectating"
-			mp_layer.spectator.visible = true
-		else:
-			mp_layer.spectator.text = ""
-			mp_layer.spectator.visible = false
-var currently_spectating: int = 0
-
 @export var initial_scene: String = "res://engine/scenes/multiplayer/test.tscn"
 #var pending_scene: String = "res://engine/scenes/save_game_room/save_game_room_template.tscn"
 var fallback_scene: String = "res://engine/scenes/multiplayer/empty.tscn"
 
-var spawn_pos: Vector2
+@onready var game: Node = $MPGame
 
 # Signals to let lobby GUI know what's going on.
 signal player_list_changed()
@@ -87,9 +40,6 @@ signal connection_failed()
 signal connection_succeeded()
 signal game_ended()
 signal game_error(what)
-# Signals for gameplay
-signal chat_message(text: String) # Prints a system message on emit
-signal player_data_changed()
 
 
 func _ready():
@@ -98,25 +48,23 @@ func _ready():
 	multiplayer.connected_to_server.connect(_connected_ok)
 	multiplayer.connection_failed.connect(_connected_fail)
 	multiplayer.server_disconnected.connect(_server_disconnected)
-	chat_message.connect(_print_system_message)
 
 
 # Callback from SceneTree.
 func _player_connected(id):
-	if !open_for_connections: return
 	# Registration of a client beings here, tell the connected player that we are here.
-	register_player.rpc_id(id, player_name, default_lives, Thunder._current_player_state)
+	register_player.rpc_id(id, player_name, game.default_lives, Thunder._current_player_state)
 
 
 # Callback from SceneTree.
 func _player_disconnected(id):
-	if spectators.has(id):
-		spectators.remove_at(spectators.find(id))
+	if game.spectators.has(id):
+		game.spectators.remove_at(game.spectators.find(id))
 	if Scenes.current_scene is Level || Scenes.current_scene is Map2D: # Game is in progress.
 		if multiplayer.is_server():
 			#game_error.emit("Player " + players[id] + " disconnected")
 			print("Player " + players[id] + " disconnected")
-			chat_message.emit("Player " + players[id] + " disconnected")
+			game.chat_message.emit("Player " + players[id] + " disconnected")
 			# Unregister this player.
 			unregister_player(id)
 			if Scenes.current_scene.get_node("Players").has_node(str(id)):
@@ -149,26 +97,28 @@ func _connected_fail():
 func register_player(new_player_name, new_lives, new_state):
 	var id = multiplayer.get_remote_sender_id()
 	players[id] = new_player_name
-	player_data[id] = [new_lives, new_state]
 	player_list_changed.emit()
 
 
 func unregister_player(id):
 	if players.has(id):
 		players.erase(id)
-		player_data.erase(id)
+		if game.has_player_data(id):
+			game.get_player_data(id).queue_free()
 		player_list_changed.emit()
 
 
 @rpc("call_local")
 func load_world():
 	online_play = true
-	spectators = []
+	game.spectators = []
+	print("[Multiplayer] Game started!")
 	# Change scene.
 	if !Scenes.scene_changed.is_connected(_scene_changed):
 		Scenes.scene_changed.connect(_scene_changed)
 	if multiplayer.is_server():
 		Scenes.goto_scene(initial_scene)
+		multiplayer.refuse_new_connections = true
 	MpLobby.hide()
 	
 	get_tree().set_pause(false) # Unpause and unleash the game!
@@ -179,12 +129,14 @@ func _scene_changed(scene: Node) -> void:
 	if !mp_layer:
 		var mp_layer_node = MP_LAYER.instantiate()
 		GlobalViewport.vp.add_child(mp_layer_node)
+		print("[Multiplayer] Multiplayer Chat added.")
 		mp_layer = mp_layer_node
 		mp_layer._update_chat.call_deferred()
 		mp_layer._update_lives_count()
 	
 	if multiplayer.multiplayer_peer && multiplayer.is_server():
 		# All peers will go to the same scene as the server
+		print("[Multiplayer] [SERVER] Attempting to move all peers to the current scene.")
 		_peers_goto_scene.rpc(scene.scene_file_path)
 		_player_connected(1)
 	
@@ -193,7 +145,7 @@ func _scene_changed(scene: Node) -> void:
 	# Get spawn position.
 	var first_player = get_tree().get_first_node_in_group(&"Player")
 	#print(first_player)
-	spawn_pos = first_player.global_position
+	game.spawn_pos = first_player.global_position
 	if is_instance_valid(first_player): first_player.queue_free()
 	
 	if multiplayer.is_server():
@@ -201,7 +153,7 @@ func _scene_changed(scene: Node) -> void:
 		var plrs = players.keys()
 		plrs.append(1)
 		for i in plrs:
-			add_player.call_deferred(i, Scenes.current_scene.get_node("Players"))
+			game.player_spawner.spawn.call_deferred(i)
 	
 	var hud_name = Thunder._current_hud.get_node("Control/MarioLives")
 	hud_name.value_template = player_name.to_upper() + " ~ %s"
@@ -210,6 +162,7 @@ func _scene_changed(scene: Node) -> void:
 
 @rpc("authority", "call_remote", "reliable", 1)
 func _peers_goto_scene(scene: String) -> void:
+	print("[Multiplayer] [CLIENT] Got a request to move to a different scene. Changing scenes...")
 	Scenes.goto_scene(scene)
 	MpLobby.hide()
 
@@ -236,110 +189,6 @@ func join_game(ip, new_player_name):
 	multiplayer.set_multiplayer_peer(peer)
 
 
-func add_player(peer_id, parent) -> Player:
-	for i in get_tree().get_nodes_in_group(&"Player"):
-		if str(i.name).to_int() == peer_id:
-			return null
-	var player = PLAYER.instantiate()
-	player.synced_position = spawn_pos
-	player.position = spawn_pos
-	print(str(peer_id))
-	player.name = str(peer_id)
-	player.set_player_name(get_player_name(peer_id).to_upper())
-	parent.add_child(player)
-	return player
-
-
-@rpc("authority", "call_local", "reliable", 1)
-func respawn_player(id: int) -> void:
-	if !id:
-		printerr("NO ID")
-		return
-	var pl_node = Scenes.current_scene.get_node("Players")
-	for i in pl_node.get_children():
-		if i.name == str(id):
-			print("User already exists! Skipped respawning.")
-			i.visible = true
-			return
-		
-	if player_data.has(id):
-		player_data[id][0] -= 1
-	
-	var player = add_player(id, pl_node)
-	player.invincible(0.6)
-
-
-@rpc("any_peer", "call_remote", "reliable", 3)
-func player_died(p_id) -> void:
-	var player: Player
-	for i in get_tree().get_nodes_in_group(&"Player"):
-		if str(i.name) == str(p_id):
-			player = i
-			break
-	Multiplayer.chat_message.emit("Player " + players[p_id] + " died!")
-	if !player || !is_instance_valid(player): return
-	
-	if player.death_body:
-		NodeCreator.prepare_2d(player.death_body, player).bind_global_transform().call_method(
-			func(db: Node2D) -> void:
-				db.animation_only = true
-				db.p_id = p_id
-				if player.death_sprite:
-					var dsdup: Node2D = player.death_sprite.duplicate()
-					db.add_child(dsdup)
-					dsdup.visible = true
-		).create_2d()
-	player.visible = false
-	player.is_dying = true
-
-
-@rpc("authority", "call_local", "reliable", 3)
-func all_players_died() -> void:
-	var pl: Player = Thunder._current_player
-	if !pl: return
-	pl.die({ "force_death": true })
-
-
-@rpc("authority", "call_local", "reliable", 3)
-func all_players_add_life(amount: int) -> void:
-	Thunder.add_lives(1)
-
-
-@rpc("any_peer", "call_remote", "reliable", 3)
-func make_player_visible(p_id) -> void:
-	for i in get_tree().get_nodes_in_group(&"Player"):
-		if str(i.name) == str(p_id):
-			i.visible = true
-			i.is_dying = false
-			break
-
-
-func start_spectating() -> void:
-	if !multiplayer.get_unique_id() in spectators: return
-	switch_spectating_player()
-
-
-func switch_spectating_player() -> void:
-	var spectating_plr: Player = null
-	for i in get_tree().get_nodes_in_group(&"Player"):
-		if !i.is_inside_tree(): continue
-		if !is_instance_valid(i): continue
-		if i.is_dying: continue
-		if str(i.name).to_int() in spectators: continue
-		if !player_data.has(str(i.name).to_int()): continue
-		
-		currently_spectating = str(i.name).to_int()
-		spectating_plr = i
-	
-	if spectating_plr:
-		var pl_lives: int = player_data[currently_spectating][0]
-		mp_layer.spectator.text = mp_layer.default_spectator_text % [
-			get_player_name(currently_spectating), # Player Name
-			pl_lives # Lives
-		]
-		mp_layer.spectator.visible = true
-
-
 func get_player_list():
 	return players.values()
 
@@ -349,12 +198,13 @@ func get_player_name(peer_id: int) -> String:
 
 
 func begin_game():
-	assert(multiplayer.is_server())
+	if !multiplayer.is_server():
+		return
 	load_world.rpc()
 	
-	(func():
+	#(func():
 		#spawn_pos: Vector2 = Scenes.current_scene.get_node("PlayerSpawn").global_position
-		Thunder._current_player.queue_free()
+	#	Thunder._current_player.queue_free()
 		
 		# Set up players.
 		#var play_node = Scenes.current_scene.get_node("Players")
@@ -382,7 +232,7 @@ func begin_game():
 			#player.set_player_name(pl_name)
 			#play_node.add_child.call_deferred(player)
 			
-	).call_deferred()
+	#).call_deferred()
 
 
 func end_game() -> void:
@@ -390,52 +240,9 @@ func end_game() -> void:
 		# End it
 		Scenes.goto_scene(fallback_scene)
 
+	print("[Multiplayer] Game ended! Turning Singleplayer Mode back on.")
 	game_ended.emit()
 	players.clear()
 	online_play = false
-
-
-func _print_system_message(text) -> void:
-	chat.remove_at(0)
-	chat.append(text)
-	if mp_layer:
-		mp_layer._update_chat()
-
-@rpc("any_peer", "call_local", "reliable", 2)
-func _print_message(text: String) -> void:
-	text = text.strip_escapes().strip_edges()
-	var p_id = multiplayer.get_remote_sender_id()
-	var sender_name: String = get_player_name(p_id)
-	text = "[%s] " % [sender_name] + text
-	chat.remove_at(0)
-	chat.append(text)
-	if mp_layer:
-		mp_layer._update_chat()
-
-
-func _input(event: InputEvent) -> void:
-	if !event is InputEventKey || !event.is_pressed():
-		return
-	match event.keycode:
-		KEY_ENTER:
-			if !mp_layer:
-				entering_message = false
-				return
-			
-			entering_message = !entering_message
-			
-			if entering_message:
-				mp_layer.input_set_focus()
-			else:
-				var entered_text: String = mp_layer.enter_msg.text
-				if entered_text.length() > 0:
-					if entered_text.length() > 64:
-						entered_text = entered_text.left(64)
-					_print_message.rpc(
-						entered_text
-					)
-				mp_layer.input_set_unfocus()
-				mp_layer.enter_msg.text = ""
-		KEY_TAB:
-			if multiplayer.get_unique_id() in spectators:
-				switch_spectating_player()
+	if is_instance_valid(mp_layer):
+		mp_layer.queue_free()

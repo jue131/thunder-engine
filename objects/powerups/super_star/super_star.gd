@@ -10,8 +10,11 @@ func _physics_process(delta: float) -> void:
 	if !appear_distance:
 		$Sprite.speed_scale = 5
 
-func collect(player: Player) -> void:
+@rpc
+func collect() -> void:
 	if appear_distance: return
+	var player = Multiplayer.game.get_player(multiplayer.get_remote_sender_id())
+	if !player: return
 	
 	if score > 0:
 		ScoreText.new(str(score), self)

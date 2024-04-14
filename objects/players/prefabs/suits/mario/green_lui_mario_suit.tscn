@@ -1,0 +1,21 @@
+[gd_scene load_steps=6 format=3 uid="uid://dpt1hnjkbbjrt"]
+
+[ext_resource type="PackedScene" uid="uid://bcxwkscs4m440" path="res://engine/objects/players/prefabs/suits/_template/_suit_template.tscn" id="1_nwayv"]
+[ext_resource type="PackedScene" uid="uid://ckpaa06bwh02o" path="res://engine/objects/players/prefabs/suits/mario/super_mario_suit.tscn" id="2_442op"]
+[ext_resource type="Script" path="res://engine/objects/players/behaviors/player_lui_behavior.gd" id="3_kv2bx"]
+[ext_resource type="Resource" uid="uid://513ld6k2bccl" path="res://engine/objects/players/prefabs/shapers/shaper_mario_super.tres" id="3_p358s"]
+[ext_resource type="SpriteFrames" uid="uid://br1851e3gt1xr" path="res://engine/objects/players/prefabs/animations/mario/animation_mario_green_lui.tres" id="4_4yai1"]
+
+[node name="GreenLuiMarioSuit" instance=ExtResource("1_nwayv")]
+suit_name = &"green_lui"
+type = 2
+gets_hurt_to = ExtResource("2_442op")
+
+[node name="PhysicsData" parent="." index="0"]
+shaper = ExtResource("3_p358s")
+
+[node name="AnimationData" parent="." index="1"]
+sprites = ExtResource("4_4yai1")
+
+[node name="BehaviorData" parent="." index="2"]
+script = ExtResource("3_kv2bx")

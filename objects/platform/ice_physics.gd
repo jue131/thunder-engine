@@ -50,13 +50,13 @@ func _physics_process(delta):
 
 func _add_slippery(_player) -> void:
 	if !_player: return
-	old_config = _player.suit.physics_config
-	_player.suit.physics_config = old_config.duplicate(true)
+	old_config = _player.suit.physics_data.config
+	_player.suit.physics_data.config = old_config.duplicate(true)
 	
-	_player.suit.physics_config.walk_acceleration = old_config.walk_acceleration / 2
-	_player.suit.physics_config.walk_initial_speed = old_config.walk_initial_speed / 2
-	_player.suit.physics_config.walk_deceleration = old_config.walk_deceleration / 4
-	_player.suit.physics_config.walk_turning_acce = old_config.walk_turning_acce / 6
+	_player.suit.physics_data.config.walk_acceleration = old_config.walk_acceleration / 2
+	_player.suit.physics_data.config.walk_initial_speed = old_config.walk_initial_speed / 2
+	_player.suit.physics_data.config.walk_deceleration = old_config.walk_deceleration / 4
+	_player.suit.physics_data.config.walk_turning_acce = old_config.walk_turning_acce / 6
 	is_slippery = true
 
 
@@ -65,19 +65,19 @@ func _remove_slippery(_player) -> void:
 	if !is_instance_valid(_player): return
 	if !old_config: return
 	
-	_player.suit.physics_config = old_config
-	_player.suit.physics_config.walk_acceleration = old_config.walk_acceleration
-	_player.suit.physics_config.walk_deceleration = old_config.walk_deceleration
-	_player.suit.physics_config.walk_turning_acce = old_config.walk_turning_acce
-	_player.suit.physics_config.animation_min_walking_speed = 1#old_config.animation_min_walking_speed
-	_player.suit.physics_config.animation_max_walking_speed = 5#old_config.animation_max_walking_speed
+	_player.suit.physics_data.config = old_config
+	_player.suit.physics_data.config.walk_acceleration = old_config.walk_acceleration
+	_player.suit.physics_data.config.walk_deceleration = old_config.walk_deceleration
+	_player.suit.physics_data.config.walk_turning_acce = old_config.walk_turning_acce
+	_player.suit.physics_data.config.animation_min_walking_speed = 1#old_config.animation_min_walking_speed
+	_player.suit.physics_data.config.animation_max_walking_speed = 5#old_config.animation_max_walking_speed
 	is_slippery = false
 
 
 func _slide() -> void:
 	if !is_instance_valid(player): return
-	player.suit.physics_config.animation_min_walking_speed = 6
-	player.suit.physics_config.animation_max_walking_speed = 6
+	player.suit.physics_data.config.animation_min_walking_speed = 6
+	player.suit.physics_data.config.animation_max_walking_speed = 6
 	if sliding_sound_interval: return
 	if is_instance_valid(sliding_effect_emitter):
 		sliding_effect_emitter.global_position = player.global_transform.translated_local(Vector2.DOWN * 16).get_origin()
@@ -90,7 +90,7 @@ func _slide() -> void:
 func _end_slide(end: bool) -> void:
 	if !is_instance_valid(sliding_effect_emitter): return
 	if is_instance_valid(player) && !end:
-		player.suit.physics_config.animation_min_walking_speed = 1
+		player.suit.physics_data.config.animation_min_walking_speed = 1
 	var dupeff := sliding_effect_emitter.duplicate() as GPUParticles2D
 	get_parent().add_sibling.call_deferred(dupeff)
 	dupeff.global_transform = sliding_effect_emitter.global_transform

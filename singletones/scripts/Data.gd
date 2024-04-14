@@ -49,11 +49,11 @@ func add_coin(amount: int = 1) -> void:
 		Data.values.coins = 0
 		Thunder.add_lives(1)
 		if multiplayer.is_server():
-			Multiplayer.all_players_add_life.rpc(1)
+			Multiplayer.game.all_players_add_life.rpc(1)
 		Audio.play_1d_sound(preload("res://engine/objects/players/prefabs/sounds/1up.wav"), false)
 
 	if multiplayer.is_server():
-		Multiplayer.coins = Data.values.coins
+		Multiplayer.game.coins = Data.values.coins
 
 func add_score(amount: int) -> void:
 	Data.values.score += amount

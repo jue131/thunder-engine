@@ -4,7 +4,7 @@ class_name Powerup
 @export_group("Powerup Settings")
 @export var slide: bool = true
 @export var to_suit: Dictionary = {
-	Mario = preload("res://engine/objects/players/prefabs/suits/mario/suit_mario_small.tres")
+	Mario = preload("res://engine/objects/players/prefabs/suits/mario/small_mario_suit.tscn")
 }
 @export var force_powerup_state: bool = false
 @export var appear_distance: float = 32
@@ -35,7 +35,7 @@ func _from_bumping_block() -> void:
 	Audio.play_sound(appearing_sound, self)
 
 func _physics_process(delta: float) -> void:
-	if !supply_behavior:
+	if !supply_behavior && multiplayer.is_server():
 		if !appear_distance:
 			motion_process(delta, slide)
 			modulate.a = 1
@@ -44,14 +44,16 @@ func _physics_process(delta: float) -> void:
 			appear_process(Thunder.get_delta(delta))
 			z_index = -1
 	
-	for player in get_tree().get_nodes_in_group(&"Player"):
-		if !is_instance_valid(player): continue
-		
-		var overlaps: bool = body.overlaps_body(player)
-		if overlaps && !one_overlap:
-			collect.rpc_id(str(player.name).to_int(), player)
-		if !overlaps && one_overlap:
-			one_overlap = false
+	if !visible: return
+	#for player in get_tree().get_nodes_in_group(&"Player"):
+	#	if !is_instance_valid(player): continue
+	var player = Thunder._current_player
+	if !player: return
+	var overlaps: bool = body.overlaps_body(player)
+	if overlaps && !one_overlap:
+		collect.rpc()
+	if !overlaps && one_overlap:
+		one_overlap = false
 
 
 func appear_process(delta: float) -> void:
@@ -61,8 +63,11 @@ func appear_process(delta: float) -> void:
 
 
 @rpc("any_peer", "call_local", "reliable")
-func collect(player: Player) -> void:
-	_change_state_logic(force_powerup_state, player)
+func collect() -> void:
+	var player = Multiplayer.game.get_player(multiplayer.get_remote_sender_id())
+	if !player: return
+	if player.is_multiplayer_authority():
+		_change_state_logic(force_powerup_state, player)
 	
 	if supply_behavior:
 		if multiplayer.get_remote_sender_id() == str(player.name).to_int():
@@ -74,31 +79,48 @@ func collect(player: Player) -> void:
 		ScoreText.new(str(score), self)
 		Data.values.score += score
 	
-	set_physics_process(false)
+	#set_physics_process(false)
 	visible = false
 	#queue_free()
 
 
-func _change_state_logic(force_powerup: bool, player) -> void:
-	var to: PlayerSuit = to_suit[player.character]
+func _change_state_logic(force_powerup: bool, player: Player) -> void:
+	var to: PackedScene = to_suit[player.character]
+	var to_state: SceneState = to.get_state()
+	var to_suit_name
+	var to_type
+	var to_gets_hurt_to
+	for i in to_state.get_node_count():
+		for j in to_state.get_node_property_count(i):
+			var node_property_name = to_state.get_node_property_name(i, j)
+			if node_property_name == "suit_name":
+				to_suit_name = to_state.get_node_property_value(i, j)
+			elif node_property_name == "type":
+				to_type = to_state.get_node_property_value(i, j)
+			elif node_property_name == "gets_hurt_to":
+				to_gets_hurt_to = to_state.get_node_property_value(i, j)
+				
 	if force_powerup:
-		if to.name != player.suit.name:
-			player.change_suit(to)
+		if to_suit_name != player.suit.suit_name:
+			player.change_suit(to.instantiate())
 			Audio.play_sound(pickup_powerup_sound, self, false, {pitch = sound_pitch})
 		else:
 			Audio.play_sound(pickup_neutral_sound, self, false, {pitch = sound_pitch})
 		return
 	
+	var current_suit: PlayerSuitScene = player.player_suit
+	if !current_suit: return
 	if (
-		to.type > player.suit.type || (
-			to.name != player.suit.name && 
-			to.type == player.suit.type
+		to_type > current_suit.type || (
+			to_suit_name != player.suit.suit_name && 
+			to_type == current_suit.type
 		)
 	):
-		if player.suit.type < to.type - 1:
-			player.change_suit(to.gets_hurt_to)
+		if current_suit.type < to_type - 1:
+			player.change_suit(to_gets_hurt_to.instantiate())
+			
 		else:
-			player.change_suit(to)
+			player.change_suit(to.instantiate())
 		Audio.play_sound(pickup_powerup_sound, self, false, {pitch = sound_pitch})
 	else:
 		Audio.play_sound(pickup_neutral_sound, self, false, {pitch = sound_pitch})

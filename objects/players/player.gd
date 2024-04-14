@@ -2,7 +2,7 @@ extends GravityBody2D
 class_name Player
 
 signal suit_appeared
-signal suit_changed(to: PlayerSuit)
+signal suit_changed(to: PlayerSuitScene)
 signal swam
 signal shot
 signal invinciblized(dur: float)
@@ -27,37 +27,40 @@ enum WarpDir {
 @export var nickname: StringName = &"MARIO"
 @export var character: StringName = &"Mario"
 @export_group("Suit")
-@export var suit: PlayerSuit = preload("res://engine/objects/players/prefabs/suits/mario/suit_mario_small.tres"):
-	set(to):
-		if (!to || suit.name == to.name) && !_force_suit: return
-		#if old_suit != suit || old_suit == null:
-		#	set_deferred("old_suit", suit)
-		suit = to.duplicate()
-		
-		if suit.animation_sprites:
-			sprite.sprite_frames = suit.animation_sprites
-		
-		_physics_behavior = null
-		_suit_behavior = null
-		_animation_behavior = null
-		_extra_behavior = null
-		if suit.physics_behavior:
-			_physics_behavior = ByNodeScript.activate_script(suit.physics_behavior, self)
-		if suit.behavior_script:
-			_suit_behavior = ByNodeScript.activate_script(suit.behavior_script, self, {suit_resource = suit.behavior_resource})
-		if suit.animation_behavior:
-			_animation_behavior = ByNodeScript.activate_script(suit.animation_behavior, self)
-		if suit.extra_behavior:
-			_extra_behavior = ByNodeScript.activate_script(suit.extra_behavior, self, suit.extra_vars)
-		if _suit_appear:
-			_suit_appear = false
-			suit_appeared.emit()
-		
-		if str(multiplayer.get_unique_id()) == str(name) || multiplayer.multiplayer_peer is OfflineMultiplayerPeer:
-			Thunder._current_player_state = suit
-		if _send_signal:
-			suit_changed.emit(suit)
-		push_warning(suit.name, multiplayer.get_unique_id())
+#@export var player_suit: PlayerSuit
+@export_file("*.tscn", "*.scn") var _suit: String = "res://engine/objects/players/prefabs/suits/mario/small_mario_suit.tscn"
+
+#@export var suit: PlayerSuit = preload("res://engine/objects/players/prefabs/suits/mario/suit_mario_small.tres"):
+#	set(to):
+#		if (!to || suit.name == to.name) && !_force_suit: return
+#		#if old_suit != suit || old_suit == null:
+#		#	set_deferred("old_suit", suit)
+#		suit = to.duplicate()
+#		
+#		if suit.animation_sprites:
+#			sprite.sprite_frames = suit.animation_sprites
+#		
+#		_physics_behavior = null
+#		_suit_behavior = null
+#		_animation_behavior = null
+#		_extra_behavior = null
+#		if suit.physics_behavior:
+#			_physics_behavior = ByNodeScript.activate_script(suit.physics_behavior, self)
+#		if suit.behavior_script:
+#			_suit_behavior = ByNodeScript.activate_script(suit.behavior_script, self, {suit_resource = suit.behavior_resource})
+#		if suit.animation_behavior:
+#			_animation_behavior = ByNodeScript.activate_script(suit.animation_behavior, self)
+#		if suit.extra_behavior:
+#			_extra_behavior = ByNodeScript.activate_script(suit.extra_behavior, self, suit.extra_vars)
+#		if _suit_appear:
+#			_suit_appear = false
+#			suit_appeared.emit()
+#		
+#		if str(multiplayer.get_unique_id()) == str(name) || multiplayer.multiplayer_peer is OfflineMultiplayerPeer:
+#			Thunder._current_player_state = suit
+#		if _send_signal:
+#			suit_changed.emit(suit)
+#		push_warning(suit.name, multiplayer.get_unique_id())
 @export_group("Physics")
 @export_enum("Left: -1", "Right: 1") var direction: int = 1:
 	set(to):
@@ -72,10 +75,10 @@ enum WarpDir {
 @export var death_check_for_lives: bool = true
 @export var death_stop_music: bool = true
 
-var _physics_behavior: ByNodeScript
-var _suit_behavior: ByNodeScript
-var _animation_behavior: ByNodeScript
-var _extra_behavior: ByNodeScript
+#var _physics_behavior: ByNodeScript
+#var _suit_behavior: ByNodeScript
+#var _animation_behavior: ByNodeScript
+#var _extra_behavior: ByNodeScript
 
 var left_right: int
 var up_down: int
@@ -102,10 +105,10 @@ var completed: bool
 var warp: Warp
 var warp_dir: WarpDir
 
-var _force_suit: bool
-var _suit_appear: bool
-var _send_signal: bool
-var old_suit: PlayerSuit
+#var _force_suit: bool
+#var _suit_appear: bool
+#var _send_signal: bool
+#var old_suit: PlayerSuit
 
 @warning_ignore("unused_private_class_variable")
 @onready var _is_ready: bool = true
@@ -125,20 +128,25 @@ var old_suit: PlayerSuit
 @onready var attack: ShapeCast2D = $Attack
 @onready var bubble: GPUParticles2D = $Sprite/Bubble
 
+@onready var suit: Node = $Suit
+var player_suit: PlayerSuitScene
+
 
 func _ready() -> void:
 	if !multiplayer.multiplayer_peer is OfflineMultiplayerPeer:
 		queue_free()
+		return
 	_initiate_transition()
 	
-	if !Thunder._current_player_state:
-		Thunder._current_player_state = suit
-	else:
-		suit = Thunder._current_player_state
-	
-	change_suit(suit, false, true)
-	
+	name = str(1)
 	Thunder._current_player = self
+	
+	if !Thunder._current_player_state:
+		player_suit = load(_suit).instantiate()
+		Thunder._current_player_state = player_suit
+	
+	change_suit(Thunder._current_player_state, false, true)
+	
 	
 	if !is_starman():
 		sprite.material.set_shader_parameter(&"mixing", false)
@@ -172,8 +180,8 @@ func _physics_process(delta: float) -> void:
 		inputs.update(self)
 		control_process()
 	
-	if !Thunder._current_player_state:
-		Thunder._current_player_state = suit
+	#if !Thunder._current_player_state:
+	#	Thunder._current_player_state = player_suit
 	
 	if is_starman && (
 		timer_starman.time_left > 0.0 &&
@@ -196,20 +204,36 @@ func control_process() -> void:
 	is_crouching = inputs.is_crouching
 
 
-@rpc("any_peer", "call_local", "reliable")
-func change_suit(to: PlayerSuit, appear: bool = true, forced: bool = false, send_signal: bool = true) -> void:
-	_force_suit = forced
-	_suit_appear = appear
-	_send_signal = send_signal
-	suit = to
-	_force_suit = false
-	_suit_appear = false
-	_send_signal = false
+#@rpc("any_peer", "call_local", "reliable")
+func change_suit(to: PlayerSuitScene, appear: bool = true, forced: bool = false, send_signal: bool = true, extra_flags: Dictionary = {}) -> void:
+	if (!to || (player_suit && player_suit.suit_name == to.suit_name)) && !forced: return
+	
+	for i in suit.get_children():
+		i.queue_free()
+	
+	print(suit)
+	suit.add_child(to, true)
+	
+	if "no_duplicate" in extra_flags && extra_flags.no_duplicate == true:
+		player_suit = to
+	else:
+		player_suit = to
+	
+	if is_multiplayer_authority():
+		Thunder._current_player_state = player_suit
+	
+	if player_suit.animation_data.sprites:
+		sprite.sprite_frames = player_suit.animation_data.sprites
+	
+	if appear:
+		suit._appear = true
+	if send_signal:
+		suit_changed.emit(player_suit)
 
 
 ## Compare current player power with [member power]
 func is_player_power(power: Data.PLAYER_POWER) -> bool:
-	return suit && suit.type == power
+	return player_suit && player_suit.type == power
 
 
 #= Status
@@ -227,16 +251,17 @@ func starman(duration: float = 10) -> void:
 
 
 func hurt(tags: Dictionary = {}) -> void:
-	if !suit:
+	if !player_suit:
 		return
 	if !tags.get(&"hurt_forced", false) && (is_invincible() || completed || warp > Warp.NONE):
 		return
 	if warp != Warp.NONE: return
 	
-	if suit.gets_hurt_to:
-		change_suit.rpc_id(multiplayer.get_unique_id(), suit.gets_hurt_to)
+	if player_suit.gets_hurt_to:
+		var new_suit: PlayerSuitScene = player_suit.gets_hurt_to.instantiate()
+		change_suit(new_suit)
 		invincible(tags.get(&"hurt_duration", 2))
-		Audio.play_sound(suit.sound_hurt, self, false, {pitch = suit.sound_pitch})
+		Audio.play_sound(player_suit.sound_hurt, self, false, {pitch = player_suit.sound_pitch})
 	else:
 		die(tags)
 	
@@ -252,9 +277,9 @@ func die(tags: Dictionary = {}) -> void:
 	if death_stop_music:
 		Audio.stop_all_musics()
 	Audio.play_music(
-		suit.sound_death if !death_music_override else death_music_override,
+		player_suit.sound_death if !death_music_override else death_music_override,
 		1 if death_stop_music else 2,
-		{pitch = suit.sound_pitch}
+		{pitch = player_suit.sound_pitch}
 	)
 	
 	if death_body:

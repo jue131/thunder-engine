@@ -1,0 +1,17 @@
+[gd_scene load_steps=5 format=3 uid="uid://ckpaa06bwh02o"]
+
+[ext_resource type="PackedScene" uid="uid://bcxwkscs4m440" path="res://engine/objects/players/prefabs/suits/_template/_suit_template.tscn" id="1_0u7is"]
+[ext_resource type="PackedScene" uid="uid://dqntcwyh51l15" path="res://engine/objects/players/prefabs/suits/mario/small_mario_suit.tscn" id="2_8k6eg"]
+[ext_resource type="Resource" uid="uid://513ld6k2bccl" path="res://engine/objects/players/prefabs/shapers/shaper_mario_super.tres" id="2_hghk3"]
+[ext_resource type="SpriteFrames" uid="uid://b1mklmn2aqcx8" path="res://engine/objects/players/prefabs/animations/mario/animation_mario_super.tres" id="3_ao17e"]
+
+[node name="SuperMarioSuit" instance=ExtResource("1_0u7is")]
+suit_name = &"super"
+type = 1
+gets_hurt_to = ExtResource("2_8k6eg")
+
+[node name="PhysicsData" parent="." index="0"]
+shaper = ExtResource("2_hghk3")
+
+[node name="AnimationData" parent="." index="1"]
+sprites = ExtResource("3_ao17e")

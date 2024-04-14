@@ -35,6 +35,7 @@ func explode():
 func expand_vision(_scale: Vector2) -> void:
 	await ready
 	if vision: vision.scale = _scale
+	is_activated = true
 
 
 func _on_level_end() -> void:

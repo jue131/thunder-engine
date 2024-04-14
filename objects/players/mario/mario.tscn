@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://1do11cr84k7y"]
+[gd_scene load_steps=17 format=3 uid="uid://1do11cr84k7y"]
 
 [ext_resource type="Script" path="res://engine/objects/players/player.gd" id="1_ofdvu"]
 [ext_resource type="Script" path="res://engine/objects/players/player_input.gd" id="2_a04ls"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://16sy2afdkb3l" path="res://engine/objects/effects/bubble/bubble.png" id="4_2mkq8"]
 [ext_resource type="Material" uid="uid://dwxmwsep7htcn" path="res://engine/particles/bubble_underwater.tres" id="4_633ve"]
 [ext_resource type="Script" path="res://engine/objects/powerups/super_star/mario_attack.gd" id="5_tgx46"]
+[ext_resource type="Script" path="res://engine/objects/players/player_suit_parent.gd" id="10_wue4a"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5emkl"]
 size = Vector2(20, 28)
@@ -16,6 +17,13 @@ size = Vector2(20, 28)
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_kdes3"]
 shader = ExtResource("2_kdm1n")
 shader_parameter/mixing = false
+
+[sub_resource type="GDScript" id="GDScript_kfjaq"]
+script/source = "extends AnimatedSprite2D
+
+func _ready() -> void:
+	$\"..\".sprite = self
+"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_k6hxb"]
 size = Vector2(16, 2)
@@ -55,6 +63,7 @@ z_index = 5
 material = SubResource("ShaderMaterial_kdes3")
 position = Vector2(0, -15)
 sprite_frames = ExtResource("2_eqact")
+script = SubResource("GDScript_kfjaq")
 
 [node name="Bubble" type="GPUParticles2D" parent="Sprite"]
 position = Vector2(0, 15)
@@ -89,13 +98,6 @@ collision_mask = 6
 collide_with_areas = true
 collide_with_bodies = false
 
-[node name="Underwater" type="Node" parent="."]
-script = ExtResource("3_vybsq")
-gravity_scale_override = 0.1
-max_falling_speed_override = 150.0
-spray_offset = Vector2(0, 8)
-metadata/_edit_pinned_properties_ = [&"max_falling_speed_override", &"gravity_scale_override"]
-
 [node name="Invincible" type="Timer" parent="."]
 process_callback = 0
 wait_time = 2.0
@@ -121,8 +123,17 @@ trigger_enemy_failed_signal = false
 special_tags = Array[StringName]([&"no_score"])
 metadata/_edit_pinned_properties_ = [&"killing_detection_scale", &"killer_type", &"special_tags"]
 
+[node name="Underwater" type="Node" parent="."]
+script = ExtResource("3_vybsq")
+gravity_scale_override = 0.1
+max_falling_speed_override = 150.0
+spray_offset = Vector2(0, 8)
+metadata/_edit_pinned_properties_ = [&"max_falling_speed_override", &"gravity_scale_override"]
+
 [node name="Inputs" type="Node" parent="."]
 script = ExtResource("2_a04ls")
 
+[node name="Suit" type="Node" parent="."]
+script = ExtResource("10_wue4a")
+
 [connection signal="timeout" from="Starman" to="." method="_on_starman_timeout"]
-[connection signal="killed" from="Attack" to="." method="_on_starman_killed"]

@@ -67,7 +67,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_bodies_standing_check()
 	
-	if !on_moving: return
+	if !on_moving || !multiplayer.is_server(): return
 	
 	_on_path_movement_process(delta)
 	_non_path_movement_process(delta)

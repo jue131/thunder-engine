@@ -1,0 +1,22 @@
+[gd_scene load_steps=6 format=3 uid="uid://bcxwkscs4m440"]
+
+[ext_resource type="Script" path="res://engine/objects/players/player_suit_scene.gd" id="1_rk80u"]
+[ext_resource type="Script" path="res://engine/objects/players/suit_data/player_physics_data.gd" id="2_35p3s"]
+[ext_resource type="Script" path="res://engine/objects/players/suit_data/player_animation_data.gd" id="3_2hdln"]
+[ext_resource type="Script" path="res://engine/objects/players/suit_data/player_behavior_data.gd" id="4_bd2b3"]
+[ext_resource type="Script" path="res://engine/objects/players/suit_data/player_extra_data.gd" id="5_4av4t"]
+
+[node name="SuitTemplate" type="Node"]
+script = ExtResource("1_rk80u")
+
+[node name="PhysicsData" type="Node" parent="."]
+script = ExtResource("2_35p3s")
+
+[node name="AnimationData" type="Node" parent="."]
+script = ExtResource("3_2hdln")
+
+[node name="BehaviorData" type="Node" parent="."]
+script = ExtResource("4_bd2b3")
+
+[node name="ExtraData" type="Node" parent="."]
+script = ExtResource("5_4av4t")

@@ -1,6 +1,7 @@
 extends StaticBumpingBlock
 
-@export var change_to_suit: PlayerSuit = preload("res://engine/objects/players/prefabs/suits/mario/suit_mario_small.tres")
+@export_file("*.tscn", "*.scn") var change_to_suit: String = "res://engine/objects/players/prefabs/suits/mario/small_mario_suit.tscn"
+@onready var new_suit: Resource = load(change_to_suit)
 
 func _ready() -> void:
 	if Engine.is_editor_hint(): return
@@ -9,10 +10,10 @@ func _ready() -> void:
 
 func _physics_process(delta):
 	super(delta)
-	if active && Thunder._current_player.suit.type == PlayerSuit.Type.SMALL:
+	if active && Thunder._current_player.suit.type == PlayerSuitScene.Type.SMALL:
 		active = false
 		_animated_sprite_2d.animation = &"empty"
-	elif !active && Thunder._current_player.suit.type > PlayerSuit.Type.SMALL:
+	elif !active && Thunder._current_player.suit.type > PlayerSuitScene.Type.SMALL:
 		active = true
 		_animated_sprite_2d.animation = &"default"
 
@@ -26,5 +27,7 @@ func got_bumped(by: Node2D) -> void:
 func call_bump(by: Node2D) -> void:
 	bump.rpc(false, 0, by)
 	_animated_sprite_2d.animation = &"empty"
-	Thunder._current_player.change_suit(change_to_suit)
+	if by.is_multiplayer_authority():
+		var suit_scene: PlayerSuitScene = new_suit.instantiate()
+		Thunder._current_player.change_suit(suit_scene)
 	Data.values.lives = ProjectSettings.get_setting(&"application/thunder_settings/player/default_lives", 4)

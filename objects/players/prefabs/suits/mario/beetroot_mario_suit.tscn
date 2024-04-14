@@ -1,0 +1,47 @@
+[gd_scene load_steps=12 format=3 uid="uid://drl3ffi25xkpo"]
+
+[ext_resource type="PackedScene" uid="uid://bcxwkscs4m440" path="res://engine/objects/players/prefabs/suits/_template/_suit_template.tscn" id="1_odrb2"]
+[ext_resource type="PackedScene" uid="uid://ckpaa06bwh02o" path="res://engine/objects/players/prefabs/suits/mario/super_mario_suit.tscn" id="2_hinpl"]
+[ext_resource type="Resource" uid="uid://513ld6k2bccl" path="res://engine/objects/players/prefabs/shapers/shaper_mario_super.tres" id="3_1eji5"]
+[ext_resource type="SpriteFrames" uid="uid://ciq78opwuq6ft" path="res://engine/objects/players/prefabs/animations/mario/animation_mario_beetroot.tres" id="4_ag4j6"]
+[ext_resource type="PackedScene" uid="uid://bc12btlrtjxyl" path="res://engine/objects/projectiles/beetroot/beetroot.tscn" id="5_cq2if"]
+[ext_resource type="Script" path="res://engine/objects/players/behaviors/player_projectile.gd" id="5_wk82m"]
+[ext_resource type="Script" path="res://engine/scripts/resources/instance_node2d/instance_node2d.gd" id="6_83wca"]
+[ext_resource type="Script" path="res://engine/objects/players/behaviors/player_projectile_resource.gd" id="7_r0qta"]
+[ext_resource type="AudioStream" uid="uid://qj2r81vrry81" path="res://engine/objects/projectiles/sounds/shoot.wav" id="8_adh5x"]
+
+[sub_resource type="Resource" id="Resource_xyo7p"]
+script = ExtResource("6_83wca")
+creation_nodepack = ExtResource("5_cq2if")
+trans_offset = Vector2(0, -20)
+trans_inheritances = 7
+trans_rotation = 0.0
+trans_scale = Vector2(1, 1)
+trans_skew = 0.0
+visi_z_index = 2
+visi_z_as_relative = true
+visi_y_sort_enabled = false
+custom_vars = {}
+
+[sub_resource type="Resource" id="Resource_elwao"]
+script = ExtResource("7_r0qta")
+projectile = SubResource("Resource_xyo7p")
+speed = Vector2(175, -125)
+amount = 2
+sound_attack = ExtResource("8_adh5x")
+
+[node name="BeetrootMarioSuit" instance=ExtResource("1_odrb2")]
+suit_name = &"beetroot"
+type = 2
+gets_hurt_to = ExtResource("2_hinpl")
+
+[node name="PhysicsData" parent="." index="0"]
+shaper = ExtResource("3_1eji5")
+
+[node name="AnimationData" parent="." index="1"]
+sprites = ExtResource("4_ag4j6")
+
+[node name="BehaviorData" parent="." index="2"]
+script = ExtResource("5_wk82m")
+behavior_resource = SubResource("Resource_elwao")
+metadata/_edit_pinned_properties_ = [&"behavior_resource"]

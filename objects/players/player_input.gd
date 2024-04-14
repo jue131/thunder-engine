@@ -22,8 +22,10 @@ func update(player: Player) -> void:
 	attacking = Input.is_action_pressed(control.attack)
 	
 	is_crouching = Input.is_action_pressed(control.down) \
-		&& player.is_on_floor() && player.suit && player.suit.physics_crouchable && !player.is_sliding
+		&& player.is_on_floor() && player.player_suit && player.player_suit.physics_data.crouchable && !player.is_sliding
 	slided = Input.is_action_pressed(control.down) \
 		&& player.is_on_floor() && abs(rad_to_deg(player.get_floor_normal().x)) > 39
 	
 	motion = Vector2i(left_right, up_down)
+
+#func _is_pressed(action: StringName)

@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://cayhht75lck5t"]
+
+[ext_resource type="Script" path="res://engine/singletones/nodes/multiplayer/mp_data.gd" id="1_p0c11"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_eif4y"]
+properties/0/path = NodePath(".:lives")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:player_cam_pos")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+
+[node name="MpData" type="Node"]
+script = ExtResource("1_p0c11")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_eif4y")

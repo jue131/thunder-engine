@@ -1,21 +1,30 @@
-extends ByNodeScript
+extends SuitData
+class_name SuitPhysicsData
 
-var player: Player
-var suit: PlayerSuit
-var config: PlayerConfig
+@export var config: PlayerConfig = preload("res://engine/objects/players/prefabs/configs/config_mario_default.tres")
+@export var crouchable: bool = true
+@export var shaper: Shaper2D = preload("res://engine/objects/players/prefabs/shapers/shaper_mario_small.tres")
+@export var shaper_crouch: Shaper2D = preload("res://engine/objects/players/prefabs/shapers/shaper_mario_small.tres")
 
-func _ready() -> void:
-	player = node as Player
-	player.underwater.got_into_water.connect(player.set.bind(&"is_underwater", true), CONNECT_REFERENCE_COUNTED)
-	player.underwater.got_out_of_water.connect(player.set.bind(&"is_underwater", false), CONNECT_REFERENCE_COUNTED)
+func _ready_mixin(pl: Player) -> void:
+	assert(pl)
+	super(pl)
+	Thunder._connect(player.underwater.got_into_water, player.set.bind(&"is_underwater", true), CONNECT_REFERENCE_COUNTED)
+	Thunder._connect(player.underwater.got_out_of_water, player.set.bind(&"is_underwater", false), CONNECT_REFERENCE_COUNTED)
+
+
+func _exit_tree_mixin() -> void:
+	Thunder._disconnect(player.underwater.got_into_water, player.set.bind(&"is_underwater", true))
+	Thunder._disconnect(player.underwater.got_out_of_water, player.set.bind(&"is_underwater", false))
 
 
 func _physics_process(delta: float) -> void:
-	if player.get_tree().paused: return
-	suit = node.suit
-	config = suit.physics_config
-	
-	delta = player.get_physics_process_delta_time()
+	super(delta)
+	#if player.get_tree().paused: return
+	if !is_instance_valid(player): return
+	if !player.player_suit: return
+	suit = Thunder._current_player_state
+	if !config: return
 
 	# Shape
 	_shape_process()
@@ -54,7 +63,7 @@ func _movement_x(delta: float) -> void:
 	# Switch to sliding movement if slided on a slope
 	if player.slided:
 		var do_slide = true if \
-			suit.physics_crouchable else true if player.left_right == 0 else false
+			crouchable else true if player.left_right == 0 else false
 		if do_slide:
 			_start_sliding_movement()
 			return
@@ -125,7 +134,7 @@ func _movement_y(delta: float) -> void:
 func _movement_climbing(delta: float) -> void:
 	if player.is_crouching || player.completed: return
 	if player.is_sliding: _stop_sliding_movement()
-	player.vel_set(Vector2(player.left_right, player.up_down) * suit.physics_config.climb_speed)
+	player.vel_set(Vector2(player.left_right, player.up_down) * config.climb_speed)
 	if player.left_right != 0:
 		player.direction = player.left_right
 	# Resist to gravity
@@ -198,24 +207,24 @@ func _shape_process() -> void:
 		player.is_crouching &&
 		player.warp == Player.Warp.NONE
 	)
-	var shaper: Shaper2D = (
-		suit.physics_shaper_crouch if crouch_shape else suit.physics_shaper
+	var shape: Shaper2D = (
+		shaper_crouch if crouch_shape else shaper
 	)
-	if !shaper: return
+	if !shape: return
 	
 	var is_colliding: bool = _shape_recovery_process()
 	
 	player.has_stuck = is_colliding
 	if player.has_stuck:
-		shaper = suit.physics_shaper_crouch
+		shape = shaper_crouch
 	
-	shaper.install_shape_for(player.collision_shape)
-	shaper.install_shape_for_caster(player.body)
-	shaper.install_shape_for_caster(player.attack)
+	shape.install_shape_for(player.collision_shape)
+	shape.install_shape_for_caster(player.body)
+	shape.install_shape_for_caster(player.attack)
 	
 	if player.collision_shape.shape is RectangleShape2D:
 		player.head.position.y = player.collision_shape.position.y - player.collision_shape.shape.size.y / 2 - 2
-		player.bubble.position.y = 0 if suit.type == PlayerSuit.Type.SMALL else -2
+		player.bubble.position.y = 0 if suit.type == PlayerSuitScene.Type.SMALL else -2
 
 
 func _shape_recovery_process() -> bool:
@@ -223,9 +232,9 @@ func _shape_recovery_process() -> bool:
 		return false
 	
 	var raycast: RayCast2D = player.collision_recovery
-	raycast.position = suit.physics_shaper.shape_pos
+	raycast.position = shaper.shape_pos
 	raycast.target_position.y = (
-		-suit.physics_shaper.shape.size.y + 16 - suit.physics_shaper.shape_pos.y
+		-shaper.shape.size.y + 16 - shaper.shape_pos.y
 	)
 	raycast.force_raycast_update()
 	var collider = raycast.get_collider()

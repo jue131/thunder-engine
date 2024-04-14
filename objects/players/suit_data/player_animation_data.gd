@@ -1,31 +1,45 @@
-extends ByNodeScript
+extends SuitData
+class_name SuitAnimationData
 
-var player: Player
-var sprite: AnimatedSprite2D
+const _default_animation_sprites: SpriteFrames = preload("res://engine/objects/players/prefabs/animations/mario/animation_mario_small.tres")
+@export var sprites: SpriteFrames = _default_animation_sprites
+
+#var sprite: AnimatedSprite2D
 var config: PlayerConfig
-
+var only_once: bool
 var _climb_progress: float
 
-func _ready() -> void:
-	player = node as Player
-	sprite = node.sprite as AnimatedSprite2D
-	
+func _ready_mixin(pl: Player) -> void:
+	super(pl)
+	config = pl.suit.physics_data.config
 	
 	# Connect animation signals for the current powerup
-	player.suit_appeared.connect(_suit_appeared)
-	player.swam.connect(_swam)
-	player.shot.connect(_shot)
-	player.invinciblized.connect(_invincible)
+	Thunder._connect(player.suit_appeared, _suit_appeared)
+	Thunder._connect(player.swam, _swam)
+	Thunder._connect(player.shot, _shot)
+	Thunder._connect(player.invinciblized, _invincible)
 	
-	sprite.animation_looped.connect(_sprite_loop)
-	sprite.animation_finished.connect(_sprite_finish)
+	Thunder._connect(sprite.animation_looped, _sprite_loop)
+	Thunder._connect(sprite.animation_finished, _sprite_finish)
+
+
+#func _exit_tree_mixin() -> void:
+#	# Disconnect animation signals from the current powerup
+#	Thunder._disconnect(player.suit_appeared, _suit_appeared)
+#	Thunder._disconnect(player.swam, _swam)
+#	Thunder._disconnect(player.shot, _shot)
+#	Thunder._disconnect(player.invinciblized, _invincible)
+#	
+#	Thunder._disconnect(sprite.animation_looped, _sprite_loop)
+#	Thunder._disconnect(sprite.animation_finished, _sprite_finish)
 
 
 func _physics_process(delta: float) -> void:
-	if player.get_tree().paused: return
-	config = node.suit.physics_config
+	super(delta)
+	#if player.get_tree().paused: return
 	
-	delta = player.get_physics_process_delta_time()
+	#delta = player.get_physics_process_delta_time()
+	if !is_instance_valid(player): return
 	_animation_process(delta)
 
 
@@ -33,7 +47,7 @@ func _physics_process(delta: float) -> void:
 func _suit_appeared() -> void:
 	if !sprite: return
 	sprite.play(&"appear")
-	await player.get_tree().create_timer(1, false, true).timeout
+	await get_tree().create_timer(1, false, true).timeout
 	if sprite.animation == &"appear": sprite.play(&"default")
 
 

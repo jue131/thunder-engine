@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://dqntcwyh51l15"]
+
+[ext_resource type="PackedScene" uid="uid://bcxwkscs4m440" path="res://engine/objects/players/prefabs/suits/_template/_suit_template.tscn" id="1_y0y0s"]
+
+[node name="SmallMarioSuit" instance=ExtResource("1_y0y0s")]
+suit_name = &"small"
+
+[node name="PhysicsData" parent="." index="0"]
+crouchable = false

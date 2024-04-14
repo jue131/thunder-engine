@@ -26,7 +26,13 @@ var _current_player: Player: # Reference to the current player
 		if !is_instance_valid(_current_player): return null
 		return _current_player
 
-var _current_player_state: PlayerSuit # Current state of the player
+var _current_player_state: PlayerSuitScene: # Current state of the player
+	set(node):
+		assert((is_instance_valid(node) && (node is PlayerSuitScene) || node == null), "Player suit node is invalid")
+		_current_player_state = node
+	get:
+		if !is_instance_valid(_current_player_state): return null
+		return _current_player_state
 
 var _current_hud: CanvasLayer: # Reference to level HUD
 	set(node):
@@ -41,7 +47,7 @@ var _current_camera: Camera2D
 
 
 ## Gets an [param key] from [param obj], and this won't send any errors if there is no such key in the object
-func get_or_null(obj: Variant, key: String):
+func get_or_null(obj: Variant, key: String) -> Variant:
 	if !is_instance_valid(obj) || !obj.get(key): return null
 	return obj[key]
 
@@ -51,6 +57,21 @@ func get_child_by_class_name(ref: Node, classname: String) -> Node:
 	for child in ref.get_children():
 		if child.is_class(classname): return child
 	return null
+
+
+## Connects a signal to a callable without throwing errors if it's already connected
+@warning_ignore("int_as_enum_without_match", "int_as_enum_without_cast")
+func _connect(sig: Signal, callable: Callable, flags: ConnectFlags = 0) -> bool:
+	if sig.is_connected(callable): return true
+	sig.connect(callable, flags)
+	return false
+
+
+## Disconnects a signal from a callable without throwing errors if it's already disconnected
+func _disconnect(sig: Signal, callable: Callable) -> bool:
+	if !sig.is_connected(callable): return true
+	sig.disconnect(callable)
+	return false
 
 
 ## Gets relative FPS by inputting delta in [method Node._process] or [method Node._physics_process]

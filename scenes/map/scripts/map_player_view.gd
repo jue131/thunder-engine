@@ -21,7 +21,7 @@ var fast_forwarding: bool = false
 func _ready() -> void:
 	# Sets powerup state to sprite
 	if Thunder._current_player_state != null:
-		player.sprite_frames = Thunder._current_player_state.animation_sprites
+		player.sprite_frames = Thunder._current_player_state.animation_data.sprites
 	else:
 		printerr(&"[Map] Thunder._current_player_state is null")
 	

@@ -91,11 +91,11 @@ class NodeCreation extends RefCounted:
 	## If you called [method NodeCreator.prepare_ins_2d] with [param ins2d] input, the function will automatically make the node 
 	## input inherit the transform properties in [InstanceNode2D][br]
 	## If [param ins2d] input, the input one will override the existing one
-	func create_2d(as_sibling: bool = true, ins2d: InstanceNode2D = null) -> NodeCreation:
+	func create_2d(as_sibling: bool = true, ins2d: InstanceNode2D = null, force_readable_name: bool = false) -> NodeCreation:
 		if !_node: return self
 		
-		if as_sibling: _on.add_sibling(_node)
-		elif Scenes.current_scene: Scenes.current_scene.add_child(_node)
+		if as_sibling: _on.add_sibling(_node, force_readable_name)
+		elif Scenes.current_scene: Scenes.current_scene.add_child(_node, force_readable_name)
 		
 		if ins2d: _ins2d = ins2d
 		if !_ins2d: return self

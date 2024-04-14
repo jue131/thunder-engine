@@ -44,7 +44,6 @@ func _init(by: Node, new_vars: Dictionary = {}) -> void:
 	if !node.is_inside_tree(): await node.ready
 	node.get_tree().process_frame.connect(_process.bind(node.get_process_delta_time()))
 	node.get_tree().physics_frame.connect(_physics_process.bind(node.get_physics_process_delta_time()))
-	node.get_tree().multiplayer_poll
 
 
 ## [code]@abstract[/code] called by [member node]'s [method Node._ready]

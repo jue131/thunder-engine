@@ -47,3 +47,6 @@ func update_dir() -> void:
 
 func speed_to_dir() -> void:
 	speed.x = abs(speed.x) * dir
+
+func set_activated(activate: bool = true) -> void:
+	is_activated = activate

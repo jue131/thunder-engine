@@ -37,11 +37,11 @@ func _ready() -> void:
 					Audio.play_music(game_over_music, 1, { "ignore_pause": true }, false, false)
 			else:
 				
-				Multiplayer.spectators.append(p_id)
+				Multiplayer.game.spectators.append(p_id)
 			return
 	
-	if multiplayer.is_server():
-		Multiplayer.respawn_player.rpc(p_id)
+	if Multiplayer.online_play && multiplayer.is_server():
+		Multiplayer.game.respawn_player.rpc(p_id)
 	
 	if animation_only: return
 	
@@ -74,7 +74,7 @@ func _ready() -> void:
 			Scenes.reload_current_scene()
 		, CONNECT_ONE_SHOT | CONNECT_DEFERRED)
 	else:
-		Multiplayer.make_player_visible.rpc(multiplayer.get_unique_id())
+		Multiplayer.game.make_player_visible.rpc(multiplayer.get_unique_id())
 
 
 func _physics_process(delta: float) -> void:

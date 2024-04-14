@@ -25,7 +25,7 @@ func teleport() -> void:
 			global_position = Vector2(player.global_position)
 		elif Multiplayer.online_play:
 			for i in get_tree().get_nodes_in_group(&"Player"):
-				if Multiplayer.currently_spectating == str(i.name).to_int():
+				if Multiplayer.game.currently_spectating == str(i.name).to_int():
 					global_position = Vector2(i.global_position)
 	
 	if par is PathFollow2D:
@@ -42,6 +42,12 @@ func teleport() -> void:
 					player.vel_set_x(0)
 			if kc && kc.get_collider():
 				player.die()
+	
+	if Multiplayer.online_play:
+		var p_id = multiplayer.get_unique_id()
+		var pl_data = Multiplayer.game.get_player_data(p_id)
+		if pl_data:
+			pl_data.player_cam_pos = get_screen_center_position()
 	
 	Thunder.view.cam_border.call_deferred()
 

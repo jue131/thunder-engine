@@ -6,11 +6,11 @@ class_name PlayerSuitProjectile
 @export var amount: int = 2
 @export var sound_attack: AudioStream = preload("res://engine/objects/projectiles/sounds/shoot.wav")
 
-
+@rpc("any_peer", "call_local", "reliable")
 func create_projectile(player: Player) -> Node2D:
 	if !player: return
 	
-	return NodeCreator.prepare_ins_2d(projectile, player).create_2d().call_method(
+	return NodeCreator.prepare_ins_2d(projectile, player).create_2d(true, null, true).call_method(
 		func(bull: Node2D) -> void:
 			if bull is GravityBody2D:
 				bull.vel_set(speed * Vector2(player.direction, 1))

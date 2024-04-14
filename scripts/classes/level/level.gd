@@ -54,7 +54,7 @@ func _ready() -> void:
 		return
 	
 	Data.values.time = time
-	Multiplayer.level_time = time
+	Multiplayer.game.level_time = time
 	
 	super()
 

@@ -5,7 +5,7 @@ static func register() -> Command:
 
 func execute(args:Array) -> Command.ExecuteResult:
 	var character: String = args[0]
-	var suit = load("res://engine/objects/players/prefabs/suits/%s/suit_%s_%s.tres" % [character, character, args[1]])
+	var suit = load("res://engine/objects/players/prefabs/suits/%s/%s_%s_suit.tscn" % [character, args[1], character])
 	if !suit:
 		return Command.ExecuteResult.new(
 			"""Try one of these: 
@@ -13,6 +13,7 @@ func execute(args:Array) -> Command.ExecuteResult:
 			For \"power\": beetroot, super, fireball, green_lui, small"""
 		)
 	
-	Thunder._current_player.suit = suit
+	var pl: Player = Thunder._current_player
+	pl.change_suit(suit.instantiate())
 	return Command.ExecuteResult.new("Success")
 

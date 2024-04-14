@@ -1,15 +1,23 @@
 extends MultiplayerSpawner
 
-func _enter_tree() -> void:
-	if !spawned.is_connected(_on_spawn):
-		spawned.connect(_on_spawn)
+func _enter_tree():
+	spawn_function = spawn_player
 
-func _on_spawn(node: Node) -> void:
-	if !node is Player: return
-	if node.name == "1": return
-	if node.name == str(multiplayer.get_unique_id()):
-		node.set_player_name(Multiplayer.player_name)
-	else:
-		node.set_player_name(Multiplayer.players[str(node.name).to_int()])
-	node.synced_position = Multiplayer.spawn_pos
-	node.position = Multiplayer.spawn_pos
+func _ready() -> void:
+	Multiplayer.game.player_spawner = self
+
+func add_player(id):
+	spawn(id)
+
+func spawn_player(id):
+	var player = Multiplayer.game.PLAYER.instantiate()
+	var had_data: bool = Multiplayer.game.has_player_data(id)
+	var p_data = Multiplayer.game.add_player_data(id)
+	#if !had_data:
+	#	p_data.lives = 4
+	
+	player.name = str(id)
+	player.synced_position = Multiplayer.game.spawn_pos
+	player.position = Multiplayer.game.spawn_pos
+	player.set_player_name(Multiplayer.get_player_name(id).to_upper())
+	return player

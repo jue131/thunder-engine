@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://dutax32ey1i8j"]
 
 [ext_resource type="Script" path="res://engine/scenes/multiplayer/mp_layer.gd" id="1_masif"]
-[ext_resource type="FontFile" uid="uid://bkw5ynamtse2j" path="res://engine/fonts/misterearlbtrusbyme.otf" id="2_8p0cs"]
+[ext_resource type="FontFile" uid="uid://cbsb33jq55o5o" path="res://engine/fonts/misterearlbtrusbyme.otf" id="2_8p0cs"]
 [ext_resource type="Script" path="res://engine/scenes/multiplayer/chat_label.gd" id="3_mlnl2"]
 
 [node name="mp_layer" type="CanvasLayer"]

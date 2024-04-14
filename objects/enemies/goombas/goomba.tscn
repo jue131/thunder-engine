@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://vqn6y17pt5mx"]
+[gd_scene load_steps=22 format=3 uid="uid://vqn6y17pt5mx"]
 
 [ext_resource type="Script" path="res://engine/scripts/nodes/general_movement/general_movement.gd" id="1_ltt83"]
 [ext_resource type="Texture2D" uid="uid://dwtn8cky8tb3l" path="res://engine/objects/enemies/goombas/textures/goomba.png" id="2_8xnig"]
@@ -77,6 +77,14 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_hmcac"]
+properties/0/path = NodePath(".:speed")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:position")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+
 [node name="Goomba" type="CharacterBody2D"]
 collision_layer = 2
 collision_mask = 32
@@ -126,6 +134,9 @@ texture = ExtResource("3_bwyev")
 self_modulate = Color(1, 1, 1, 0.0196078)
 script = ExtResource("3_ccgfb")
 metadata/_edit_lock_ = true
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_hmcac")
 
 [connection signal="collided_wall" from="." to="." method="turn_x"]
 [connection signal="killed_succeeded" from="Body/EnemyAttacked" to="." method="queue_free"]
