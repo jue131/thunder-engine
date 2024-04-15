@@ -32,7 +32,6 @@ func _physics_process(delta) -> void:
 	# Activation
 	var player: Player = Thunder._current_player
 	if player && overlaps_body(player) && Data.values.checkpoint != id:
-		Data.values.checkpoint = id
 		activate.rpc()
 	# Deactivation
 	if Data.values.checkpoint != id && animation_player.current_animation == "checkpoint":
@@ -43,6 +42,7 @@ func _physics_process(delta) -> void:
 
 @rpc("any_peer", "call_local", "reliable")
 func activate() -> void:
+	Data.values.checkpoint = id
 	Audio.play_1d_sound(sound, false)
 	if Multiplayer.online_play:
 		var pl: Player = Multiplayer.game.get_player(multiplayer.get_remote_sender_id())

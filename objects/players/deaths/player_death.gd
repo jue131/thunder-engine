@@ -38,10 +38,12 @@ func _ready() -> void:
 			else:
 				
 				Multiplayer.game.spectators.append(p_id)
+				
 			return
 	
 	if Multiplayer.online_play && multiplayer.is_server():
-		Multiplayer.game.respawn_player.rpc(p_id)
+		if Multiplayer.game.get_player_data(p_id).lives > 0:
+			Multiplayer.game.respawn_player.rpc(p_id)
 	
 	if animation_only: return
 	
