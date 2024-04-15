@@ -23,6 +23,8 @@ extends PathFollow2D
 @export var custom_vars: Dictionary
 @export var custom_script: GDScript
 
+@export var synced_position: Vector2 = global_position
+
 var on_path: bool = true
 
 var smooth_speed: float
@@ -67,10 +69,14 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_bodies_standing_check()
 	
-	if !on_moving || !multiplayer.is_server(): return
+	if !on_moving: return
 	
-	_on_path_movement_process(delta)
-	_non_path_movement_process(delta)
+	if is_multiplayer_authority():
+		_on_path_movement_process(delta)
+		_non_path_movement_process(delta)
+		synced_position = global_position
+	else:
+		global_position = synced_position
 	
 	if block.sync_to_physics: block.global_position = block.global_position
 

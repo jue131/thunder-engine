@@ -55,6 +55,7 @@ func _ready() -> void:
 	
 	Data.values.time = time
 	Multiplayer.game.level_time = time
+	#Thunder._connect(level_completed, Multiplayer.game._on_level_completed)
 	
 	super()
 
@@ -119,12 +120,20 @@ func _physics_process(delta: float) -> void:
 				falling_below_warp_target.pass_player(player)
 
 
+@rpc("any_peer", "call_local", "reliable")
 func finish(walking: bool = false, walking_dir: int = 1) -> void:
-	if !Thunder._current_player: return
+	var player = Thunder._current_player
+	if Multiplayer.online_play:
+		if is_multiplayer_authority():
+			Multiplayer.game.finish_level.rpc(multiplayer.get_remote_sender_id())
+		if player && player.completed: return
+	else:
+		if !player: return
+	
 	level_completed.emit()
+	player.completed = true
 	
 	Thunder._current_hud.timer.paused = true
-	Thunder._current_player.completed = true
 	if 1 in Audio._music_channels && is_instance_valid(Audio._music_channels[1]):
 		Audio._music_channels[1].stop()
 	if completion_music:
@@ -158,7 +167,8 @@ func finish(walking: bool = false, walking_dir: int = 1) -> void:
 				
 				TransitionManager.transition_middle.connect(func():
 					TransitionManager.current_transition.paused = true
-					Scenes.goto_scene(jump_to_scene)
+					if multiplayer.is_server():
+						Scenes.goto_scene(jump_to_scene)
 					Scenes.scene_changed.connect(func(_current_scene):
 						TransitionManager.current_transition.paused = false
 					, CONNECT_ONE_SHOT)

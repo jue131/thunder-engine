@@ -9,6 +9,7 @@ var default_lives: int = ProjectSettings.get_setting("application/thunder_settin
 @onready var data_nodes: Node = $DataNodes
 
 var player_spawner: MultiplayerSpawner
+
 var spawn_pos: Vector2
 
 # Player spectators.
@@ -42,24 +43,11 @@ var currently_spectating: int = 0
 		coins = new
 		if !multiplayer.is_server():
 			Data.values.coins = coins
+@export var level_completed: bool
 
 
 # Signals for gameplay
 signal chat_message(text: String) # Prints a system message on emit
-
-
-func add_player(peer_id, parent) -> Player:
-	for i in get_tree().get_nodes_in_group(&"Player"):
-		if str(i.name).to_int() == peer_id:
-			return null
-	var player = PLAYER.instantiate()
-	player.synced_position = spawn_pos
-	player.position = spawn_pos
-	print(str(peer_id))
-	player.name = str(peer_id)
-	player.set_player_name(Multiplayer.get_player_name(peer_id).to_upper())
-	parent.add_child(player)
-	return player
 
 
 func get_player(p_id: int) -> Player:
@@ -101,23 +89,31 @@ func set_player_data(p_id: int, property_name: StringName, value: Variant) -> vo
 	buffer[p_id] = [property_name, value]
 
 
-@rpc("authority", "call_local", "reliable", 1)
+@rpc("authority", "call_local", "reliable", 3)
 func respawn_player(id: int) -> void:
 	if !id:
 		printerr("NO ID")
 		return
-	var pl_node = Scenes.current_scene.get_node("Players")
-	for i in pl_node.get_children():
-		if i.name == str(id):
-			print("[Multiplayer] User already exists! Skipped respawning.")
-			i.visible = true
-			return
 		
 	if has_player_data(id):
 		get_player_data(id).lives -= 1
 	
-	var player = player_spawner.add_player(id)
-	player.invincible(0.6)
+	if !multiplayer.is_server():
+		return
+	
+	var pl_node = Scenes.current_scene.get_node("Players")
+	for i in pl_node.get_children():
+		if i.name == str(id):
+			i.queue_free()
+			#print("[Multiplayer] User already exists! Skipped respawning.")
+			#i.visible = true
+			#return
+	player_spawner.add_player.call_deferred(
+		{
+			"id": id,
+			"respawned": true
+		}
+	)
 
 
 @rpc("any_peer", "call_remote", "reliable", 3)
@@ -175,6 +171,24 @@ func player_changed_suit(suit_path: String, appear: bool, forced: bool, send_sig
 	player.mp_change_suit.rpc_id(p_id, suit_path, appear, forced, send_signal, {"rpc": true, "no_duplicate": true})
 
 
+@rpc("authority", "call_local", "reliable")
+func finish_level(p_id: int):
+	level_completed = true
+	chat_message.emit(str(p_id) + " finished the level!")
+	
+	if p_id == multiplayer.get_unique_id():
+		return
+	
+	var pl = get_player(multiplayer.get_unique_id())
+	if !pl || !pl.completed:
+		pl.visible = false
+		pl.warp = pl.Warp.IN
+		pl.suit.set_physics_process(false)
+		pl.set_physics_process(false)
+	spectators.append(multiplayer.get_unique_id())
+	start_spectating()
+
+
 func start_spectating() -> void:
 	if !multiplayer.get_unique_id() in spectators: return
 	print("[Multiplayer] [CLIENT] No lives left! Switching to Spectator Mode.")
@@ -186,7 +200,7 @@ func switch_spectating_player() -> void:
 	for i in get_tree().get_nodes_in_group(&"Player"):
 		if !i.is_inside_tree(): continue
 		if !is_instance_valid(i): continue
-		if i.is_dying: continue
+		if i.is_dying && !i.completed: continue
 		currently_spectating = str(i.name).to_int()
 		if currently_spectating in spectators: continue
 		if !has_player_data(currently_spectating): continue

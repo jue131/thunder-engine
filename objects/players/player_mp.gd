@@ -33,10 +33,14 @@ func _ready() -> void:
 		change_suit(Thunder._current_player_state, false, true, true)
 	else:
 		(func():
-			var p_data = Multiplayer.game.get_player_data(str(name).to_int()).get_suit()
-			if !p_data:
-				p_data = _suit
-			player_suit = load(p_data).instantiate()
+			var p_data = Multiplayer.game.get_player_data(str(name).to_int())
+			var data_suit
+			if p_data && p_data.get_suit():
+				data_suit = p_data.get_suit()
+			else:
+				data_suit = _suit
+			
+			player_suit = load(data_suit).instantiate()
 			change_suit(player_suit, false, true, true)
 		).call_deferred()
 	
@@ -56,7 +60,8 @@ func _physics_process(delta: float) -> void:
 		inputs.update(self)
 		if !Thunder._current_player_state:
 			Thunder._current_player_state = player_suit
-	control_process()
+	if !completed:
+		control_process()
 	
 	if multiplayer.multiplayer_peer == null || is_multiplayer_authority():
 		# The server updates the position that will be notified to the clients.

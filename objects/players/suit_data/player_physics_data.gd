@@ -23,8 +23,9 @@ func _physics_process(delta: float) -> void:
 	#if player.get_tree().paused: return
 	if !is_instance_valid(player): return
 	if !player.player_suit: return
-	suit = Thunder._current_player_state
+	suit = player.player_suit
 	if !config: return
+	if !suit: return
 
 	# Shape
 	_shape_process()

@@ -27,5 +27,5 @@ func _physics_process(delta: float) -> void:
 
 
 func _on_visible_on_screen_notifier_2d_screen_exited() -> void:
-	Scenes.current_scene.finish(true, direction_to_complete)
+	Scenes.current_scene.finish.rpc(true, direction_to_complete)
 	queue_free()

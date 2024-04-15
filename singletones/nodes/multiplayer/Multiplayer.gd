@@ -48,6 +48,8 @@ func _ready():
 	multiplayer.connected_to_server.connect(_connected_ok)
 	multiplayer.connection_failed.connect(_connected_fail)
 	multiplayer.server_disconnected.connect(_server_disconnected)
+	# Receiving a packet with textures from peers
+	multiplayer.peer_packet.connect(UserSkin.get_texture_bytes)
 
 
 # Callback from SceneTree.
@@ -96,6 +98,10 @@ func _connected_fail():
 @rpc("any_peer", "call_local")
 func register_player(new_player_name, new_lives, new_state):
 	var id = multiplayer.get_remote_sender_id()
+	if UserSkin.custom_textures.is_empty():
+		print("Using standard textures for ", id)
+	else:
+		multiplayer.send_bytes(UserSkin.send_texture_bytes(id))
 	players[id] = new_player_name
 	player_list_changed.emit()
 
@@ -140,6 +146,7 @@ func _scene_changed(scene: Node) -> void:
 		_peers_goto_scene.rpc(scene.scene_file_path)
 		_player_connected(1)
 	
+	game.level_completed = false
 	if !scene is Level: return
 	
 	# Get spawn position.
@@ -151,7 +158,7 @@ func _scene_changed(scene: Node) -> void:
 	if multiplayer.is_server():
 		# Add players to Level
 		var plrs = players.keys()
-		plrs.append(1)
+		#plrs.append(1)
 		for i in plrs:
 			game.player_spawner.spawn.call_deferred(i)
 	

@@ -219,16 +219,29 @@ func change_suit(to: PlayerSuitScene, appear: bool = true, forced: bool = false,
 	else:
 		player_suit = to
 	
+	var p_id = multiplayer.get_remote_sender_id()
 	if is_multiplayer_authority():
 		Thunder._current_player_state = player_suit
+		p_id = 0
 	
 	if player_suit.animation_data.sprites:
-		sprite.sprite_frames = player_suit.animation_data.sprites
+		apply_player_skin(p_id)
 	
 	if appear:
 		suit._appear = true
 	if send_signal:
 		suit_changed.emit(player_suit)
+
+
+func apply_player_skin(p_id: int) -> bool:
+	var skin_name: String = "%s_%s".to_lower() % [player_suit.suit_name.to_lower(), character.to_lower()]
+	# multiplayer.get_remote_sender_id()
+	if UserSkin.custom_textures.has(skin_name):
+		#var skin = UserSkin.custom_textures[skin_name]
+		sprite.sprite_frames = UserSkin.get_custom_sprite_frames(player_suit.animation_data.sprites, skin_name, p_id)
+		return true
+	sprite.sprite_frames = player_suit.animation_data.sprites
+	return false
 
 
 ## Compare current player power with [member power]

@@ -74,3 +74,5 @@ duration = 0.3
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_xn2ty")
+
+[connection signal="collided_wall" from="." to="." method="turn_x"]

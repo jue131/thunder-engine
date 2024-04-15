@@ -27,7 +27,7 @@ func _physics_process(_delta: float) -> void:
 	)
 	var completion2: bool = completion_area.overlaps_body(player) && use_strict_detection_area
 	if player.is_on_floor() && (completion1 || completion2):
-		Scenes.current_scene.finish(true, direction_to_complete)
+		Scenes.current_scene.finish.rpc(true, direction_to_complete)
 		triggered = true
 		animation_player.stop(true)
 		Data.values.score += 100

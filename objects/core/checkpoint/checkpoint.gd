@@ -18,7 +18,9 @@ extends Area2D
 
 func _ready() -> void:
 	if Data.values.checkpoint == id:
-		Thunder._current_player.global_position = global_position + Vector2.UP.rotated(global_rotation) * 16
+		var player: Player = Thunder._current_player
+		if player:
+			player.global_position = global_position + Vector2.UP.rotated(global_rotation) * 16
 		text.modulate.a = 1
 		animation_player.play(&"checkpoint")
 
@@ -31,7 +33,7 @@ func _physics_process(delta) -> void:
 	var player: Player = Thunder._current_player
 	if player && overlaps_body(player) && Data.values.checkpoint != id:
 		Data.values.checkpoint = id
-		activate()
+		activate.rpc()
 	# Deactivation
 	if Data.values.checkpoint != id && animation_player.current_animation == "checkpoint":
 		animation_player.play(&"RESET")
@@ -39,8 +41,13 @@ func _physics_process(delta) -> void:
 		tween.tween_property(text, ^"modulate:a", alpha, 0.2)
 
 
+@rpc("any_peer", "call_local", "reliable")
 func activate() -> void:
 	Audio.play_1d_sound(sound, false)
+	if Multiplayer.online_play:
+		var pl: Player = Multiplayer.game.get_player(multiplayer.get_remote_sender_id())
+		Multiplayer.game.spawn_pos = global_position + Vector2.UP.rotated(global_rotation) * 16
+		Multiplayer.game.chat_message.emit(pl.get("nickname") + " got a checkpoint!")
 	
 	var tween = create_tween()
 	tween.tween_property(text, ^"modulate:a", 1.0, 0.2)
@@ -48,7 +55,13 @@ func activate() -> void:
 	animation_text_flying.play(&"triggered")
 	
 	get_tree().create_timer(0.5, false, true).timeout.connect(func() -> void:
-		Audio.play_1d_sound(voice_lines[randi_range(0, len(voice_lines) - 1)])
+		var pl: Player
+		if Multiplayer.online_play:
+			pl = Multiplayer.game.get_player(multiplayer.get_remote_sender_id())
+		else:
+			pl = Thunder._current_player
+		if !pl: return
+		Audio.play_sound(voice_lines[randi_range(0, len(voice_lines) - 1)], pl)
 	)
 	
 	if permanent_checked && !id in Data.values.checked_cps:

@@ -21,7 +21,7 @@ func teleport() -> void:
 	if !is_current(): return
 	var player: Player = Thunder._current_player
 	if !par is PathFollow2D:
-		if player:
+		if player && !Multiplayer.game.currently_spectating:
 			global_position = Vector2(player.global_position)
 		elif Multiplayer.online_play:
 			for i in get_tree().get_nodes_in_group(&"Player"):

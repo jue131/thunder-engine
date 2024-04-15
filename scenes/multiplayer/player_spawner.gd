@@ -6,10 +6,19 @@ func _enter_tree():
 func _ready() -> void:
 	Multiplayer.game.player_spawner = self
 
-func add_player(id):
-	spawn(id)
+func add_player(data: Dictionary) -> Player:
+	return spawn(data)
 
-func spawn_player(id):
+func spawn_player(data):
+	var id
+	var respawned: bool = false
+	if data is Dictionary:
+		if !"id" in data: return
+		id = data.id
+		if "respawned" in data && data.respawned == true:
+			respawned = true
+	elif data is int:
+		id = data
 	var player = Multiplayer.game.PLAYER.instantiate()
 	var had_data: bool = Multiplayer.game.has_player_data(id)
 	var p_data = Multiplayer.game.add_player_data(id)
@@ -20,4 +29,6 @@ func spawn_player(id):
 	player.synced_position = Multiplayer.game.spawn_pos
 	player.position = Multiplayer.game.spawn_pos
 	player.set_player_name(Multiplayer.get_player_name(id).to_upper())
+	if respawned:
+		player.invincible.call_deferred(0.6)
 	return player
