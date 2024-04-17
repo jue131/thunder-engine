@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://ctpsv143q5pjv"]
+[gd_scene load_steps=22 format=3 uid="uid://ctpsv143q5pjv"]
 
 [ext_resource type="Script" path="res://engine/objects/enemies/koopas/koopa_shell.gd" id="1_4u51b"]
 [ext_resource type="Script" path="res://engine/scripts/nodes/enemies/enemy_attacked.gd" id="2_f14e0"]
@@ -9,8 +9,8 @@
 [ext_resource type="Script" path="res://engine/scripts/resources/instance_node2d/instance_node2d.gd" id="6_hgfia"]
 [ext_resource type="AudioStream" uid="uid://be3uvqev2c1p6" path="res://engine/objects/players/prefabs/sounds/kick.wav" id="7_uy00l"]
 [ext_resource type="Script" path="res://engine/objects/projectiles/projectile_attack.gd" id="8_yvu7y"]
+[ext_resource type="Script" path="res://engine/scripts/nodes/vision/activation.gd" id="9_x4xvu"]
 [ext_resource type="Texture2D" uid="uid://dfrouvuwj4hk0" path="res://engine/objects/enemies/koopas/textures/shell_green.png" id="10_bsier"]
-[ext_resource type="Script" path="res://engine/scripts/nodes/vision/vision.gd" id="11_vu45w"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dceiv"]
 size = Vector2(32, 28)
@@ -32,6 +32,9 @@ custom_vars = {
 "death_speed": Vector2(0, -250)
 }
 custom_script = ExtResource("5_pugg3")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ko8fp"]
+size = Vector2(32, 32)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_alv11"]
 radius = 8.0
@@ -124,6 +127,12 @@ killing_scores = 100
 killing_sound_succeeded = ExtResource("7_uy00l")
 metadata/_edit_pinned_properties_ = [&"stomping_scores", &"stomping_sound", &"killing_creation"]
 
+[node name="Activation" type="Area2D" parent="."]
+script = ExtResource("9_x4xvu")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Activation"]
+shape = SubResource("RectangleShape2D_ko8fp")
+
 [node name="Attack" type="ShapeCast2D" parent="."]
 visible = false
 shape = SubResource("CircleShape2D_alv11")
@@ -141,12 +150,6 @@ metadata/_edit_pinned_properties_ = [&"killing_detection_scale", &"killer_type",
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, 2)
 sprite_frames = SubResource("SpriteFrames_2216j")
-
-[node name="VisibleOnScreenEnabler2D" type="VisibleOnScreenEnabler2D" parent="."]
-self_modulate = Color(1, 1, 1, 0.0196078)
-position = Vector2(0, 2)
-script = ExtResource("11_vu45w")
-metadata/_edit_lock_ = true
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_xmimy")

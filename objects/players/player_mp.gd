@@ -93,7 +93,7 @@ func change_suit(to: Variant, appear: bool = true, forced: bool = false, send_si
 		#Multiplayer.game.player_changed_suit.rpc_id(multiplayer.get_unique_id(), to.resource_path, appear, forced, send_signal)
 		if to is PlayerSuitScene:
 			var suit_path: String = to.scene_file_path
-			Multiplayer.game.set_player_data(multiplayer.get_unique_id(), "suit", suit_path)
+			Multiplayer.game.set_player_data.rpc("suit", suit_path)
 			change_suit.rpc(suit_path, appear, forced, send_signal, {"rpc": true})
 		return
 	print(multiplayer.is_server(), ", suit changed for " + str(multiplayer.get_unique_id()) + "!")

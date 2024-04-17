@@ -11,7 +11,7 @@ extends Node2D
 
 var step: int
 
-@onready var vision: VisibleOnScreenNotifier2D = $VisibleOnScreenNotifier2D
+@onready var vision: ActivationArea = $Activation
 @onready var timer_step: Timer = $Step
 @onready var extra_script: Script = ByNodeScript.activate_script(custom_script, self, custom_vars)
 
@@ -33,8 +33,10 @@ func _ready() -> void:
 	)
 
 func _physics_process(delta: float) -> void:
+	if !Multiplayer.is_host():
+		return
 	var speed: float = stretching_speed * delta
-	var player: Node2D = Thunder._current_player
+	var player: Node2D = Thunder.get_closest_player(global_position)
 	var ppos: Vector2 = global_transform.affine_inverse().basis_xform(player.global_position if player else Vector2.ZERO)
 	var spos: Vector2 = global_transform.affine_inverse().basis_xform(global_position)
 	var can_stretch_out: bool = vision.is_on_screen() && player && abs(spos.x - ppos.x) > range_in_pipe

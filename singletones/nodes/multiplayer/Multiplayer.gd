@@ -70,8 +70,10 @@ func _player_disconnected(id):
 			game.chat_message.emit("Player " + players[id] + " disconnected")
 			# Unregister this player.
 			unregister_player(id)
-			if Scenes.current_scene.get_node("Players").has_node(str(id)):
-				Scenes.current_scene.get_node("Players").get_node(str(id)).queue_free()
+			var players = get_tree().get_nodes_in_group(&"Player")
+			for i in players:
+				if str(i.name) == str(id):
+					i.queue_free()
 			#end_game()
 	else: # Game is not in progress.
 		unregister_player(id)
@@ -256,8 +258,12 @@ func end_game() -> void:
 		mp_layer.queue_free()
 
 
+func is_host() -> bool:
+	return (multiplayer && multiplayer.is_server()) || !Multiplayer.online_play
+
+
 @rpc("authority", "call_local", "reliable")
-func _free(node_path: NodePath) -> void:
+func host_free(node_path: NodePath) -> void:
 	if !node_path: return
 	var node = get_node_or_null(node_path)
 	if is_instance_valid(node):

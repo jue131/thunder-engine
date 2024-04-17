@@ -17,10 +17,9 @@ func _ready() -> void:
 	)
 
 @rpc("any_peer", "call_local", "reliable")
-func got_bumped(by: Node2D) -> void:
+func got_bumped(is_small: bool) -> void:
 	if !_active: return
 	if parent._triggered: return
-	if by is Player: return
 	
-	parent.call_bump()
+	parent.call_bump.rpc(is_small)
 	

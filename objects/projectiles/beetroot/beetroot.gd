@@ -43,7 +43,7 @@ func bounce(with_sound: bool = true, ceiling: bool = false) -> void:
 			collider is StaticBumpingBlock &&
 			collider.has_method(&"got_bumped")
 		):
-			collider.got_bumped.rpc(self)
+			collider.got_bumped.rpc(false)
 
 
 func _on_level_end() -> void:

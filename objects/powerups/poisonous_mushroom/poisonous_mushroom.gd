@@ -2,7 +2,7 @@ extends Powerup
 
 const explosion_effect = preload("res://engine/objects/effects/explosion/explosion.tscn")
 
-@rpc
+@rpc("any_peer", "call_local", "reliable")
 func collect() -> void:
 	if appear_distance: return
 	var player = Multiplayer.game.get_player(multiplayer.get_remote_sender_id())
@@ -12,5 +12,6 @@ func collect() -> void:
 	player.die()
 	
 	NodeCreator.prepare_2d(explosion_effect, self).create_2d().bind_global_transform()
-	queue_free()
+	if Multiplayer.is_host():
+		Multiplayer.host_free(get_path())
 

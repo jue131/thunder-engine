@@ -44,10 +44,10 @@ func teleport() -> void:
 				player.die()
 	
 	if Multiplayer.online_play:
-		var p_id = multiplayer.get_unique_id()
-		var pl_data = Multiplayer.game.get_player_data(p_id)
-		if pl_data:
-			pl_data.player_cam_pos = get_screen_center_position()
+		#var p_id = multiplayer.get_unique_id()
+		#var pl_data = Multiplayer.game.get_player_data(p_id)
+		#if pl_data:
+		Multiplayer.game.set_player_data.rpc("player_cam_pos", get_screen_center_position())
 	
 	Thunder.view.cam_border.call_deferred()
 

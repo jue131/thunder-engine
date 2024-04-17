@@ -116,7 +116,7 @@ func send_texture_bytes(p_id: int) -> PackedByteArray:
 
 func get_texture_bytes(p_id: int, packet: PackedByteArray):
 	var texture_array: Array = bytes_to_var(packet.slice(12))
-	var texture_dict: Dictionary
+	var texture_dict: Dictionary = {}
 	
 	var counter: int = 0
 	for i in texture_array:

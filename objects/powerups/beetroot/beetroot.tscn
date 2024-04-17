@@ -1,13 +1,16 @@
-[gd_scene load_steps=14 format=3 uid="uid://8a7nemgi0b6q"]
+[gd_scene load_steps=15 format=3 uid="uid://8a7nemgi0b6q"]
 
 [ext_resource type="Script" path="res://engine/objects/powerups/powerup.gd" id="1_elpo1"]
 [ext_resource type="PackedScene" uid="uid://drl3ffi25xkpo" path="res://engine/objects/players/prefabs/suits/mario/beetroot_mario_suit.tscn" id="2_4dc2w"]
+[ext_resource type="Script" path="res://engine/scripts/nodes/vision/activation.gd" id="3_c32q0"]
 [ext_resource type="Texture2D" uid="uid://3y6dl3ecp4ph" path="res://engine/objects/powerups/beetroot/texture.png" id="3_scld5"]
-[ext_resource type="Script" path="res://engine/scripts/nodes/vision/vision.gd" id="4_tk2ye"]
 [ext_resource type="Script" path="res://engine/scripts/classes/effecters/point_light_2d_appear.gd" id="5_3norx"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_w2yun"]
 size = Vector2(31, 31)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_780ht"]
+size = Vector2(32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_br1rb"]
 atlas = ExtResource("3_scld5")
@@ -83,14 +86,16 @@ visible = false
 shape = SubResource("RectangleShape2D_w2yun")
 debug_color = Color(0, 0.643137, 0.309804, 0.419608)
 
+[node name="Activation" type="Area2D" parent="."]
+visible = false
+script = ExtResource("3_c32q0")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Activation"]
+shape = SubResource("RectangleShape2D_780ht")
+
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_wkrha")
 autoplay = "default"
-
-[node name="VisibleOnScreenEnabler2D" type="VisibleOnScreenEnabler2D" parent="."]
-self_modulate = Color(1, 1, 1, 0.0196078)
-script = ExtResource("4_tk2ye")
-metadata/_edit_lock_ = true
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
 blend_mode = 2

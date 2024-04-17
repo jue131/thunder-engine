@@ -1,6 +1,7 @@
 extends Node
 
 const PLAYER = preload("res://engine/objects/players/mario/mp_mario.tscn")
+const SCREEN_AREA = preload("res://engine/objects/players/screen_area.tscn")
 const MP_DATA = preload("res://engine/singletones/nodes/multiplayer/mp_data.tscn")
 
 var default_lives: int = ProjectSettings.get_setting("application/thunder_settings/player/default_lives", 4)
@@ -9,6 +10,7 @@ var default_lives: int = ProjectSettings.get_setting("application/thunder_settin
 @onready var data_nodes: Node = $DataNodes
 
 var player_spawner: MultiplayerSpawner
+var player_area_spawner: MultiplayerSpawner
 
 var spawn_pos: Vector2
 
@@ -82,11 +84,25 @@ func has_player_data(p_id: int) -> bool:
 	return data_nodes.has_node(str(p_id))
 
 var buffer: Dictionary = {}
-func set_player_data(p_id: int, property_name: StringName, value: Variant) -> void:
+@rpc("any_peer", "call_local", "reliable")
+func set_player_data(property: StringName, value: Variant) -> void:
+	var p_id: int = multiplayer.get_remote_sender_id()
 	if has_player_data(p_id):
-		get_player_data(p_id).set(property_name, value)
+		var pl_data = get_player_data(p_id)
+		if str(pl_data.name).to_int() != p_id:
+			return
+		get_player_data(p_id).set(property, value)
 		return
-	buffer[p_id] = [property_name, value]
+	buffer[p_id] = [property, value]
+
+@rpc("any_peer", "call_remote", "unreliable")
+func set_player_data_unreliable(property: StringName, value: Variant) -> void:
+	var p_id: int = multiplayer.get_remote_sender_id()
+	if has_player_data(p_id):
+		var pl_data = get_player_data(p_id)
+		if str(pl_data.name).to_int() != p_id:
+			return
+		pl_data.set(property, value)
 
 
 @rpc("authority", "call_local", "reliable", 3)
@@ -101,8 +117,8 @@ func respawn_player(id: int) -> void:
 	if !multiplayer.is_server():
 		return
 	
-	var pl_node = Scenes.current_scene.get_node("Players")
-	for i in pl_node.get_children():
+	var players = get_tree().get_nodes_in_group(&"Player")
+	for i in players:
 		if i.name == str(id):
 			i.queue_free()
 			#print("[Multiplayer] User already exists! Skipped respawning.")
@@ -120,6 +136,7 @@ func respawn_player(id: int) -> void:
 func player_died(p_id) -> void:
 	var player: Player = get_player(p_id)
 	if !player: return
+	if player.warp != player.Warp.NONE: return
 	chat_message.emit("Player " + Multiplayer.players[p_id] + " died!")
 	
 	if player.death_body:
@@ -134,6 +151,8 @@ func player_died(p_id) -> void:
 		).create_2d()
 	player.visible = false
 	player.is_dying = true
+	player.set_physics_process(false)
+	player.suit.process_mode = Node.PROCESS_MODE_DISABLED
 
 
 @rpc("authority", "call_local", "reliable", 3)

@@ -18,10 +18,7 @@ extends AnimatableBody2D
 @onready var launcher: Sprite2D = $Launcher
 @onready var pos_bullet: Marker2D = $Launcher/PosBullet
 @onready var interval: Timer = $Interval
-
-
-func _ready() -> void:
-	interval.start(first_shooting_delay)
+var activated_once: bool = false
 
 
 func _on_bullet_launched() -> void:
@@ -30,7 +27,7 @@ func _on_bullet_launched() -> void:
 
 @rpc("call_local", "reliable")
 func _mp_bullet_launched() -> void:
-	var player: Player = Thunder._current_player
+	var player: Player = Thunder.get_closest_player(global_position)
 	if !player:
 		interval.start(0.1)
 		return
@@ -63,6 +60,9 @@ func _mp_bullet_launched() -> void:
 
 
 func _on_screen_entered() -> void:
+	if !activated_once:
+		interval.start(first_shooting_delay)
+		activated_once = true
 	interval.paused = false
 
 

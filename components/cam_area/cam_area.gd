@@ -23,8 +23,13 @@ var is_current: bool = false
 func _ready() -> void:
 	if Engine.is_editor_hint(): return
 	var player: Player = Thunder._current_player
-	if !player: return
-	if get_rect().abs().has_point(player.global_position): _switch_bounds()
+	for i in range(8):
+		if player:
+			break
+		await get_tree().process_frame
+	
+	if player && get_rect().abs().has_point(player.global_position):
+		_switch_bounds()
 
 
 func _draw() -> void:

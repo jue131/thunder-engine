@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://vqn6y17pt5mx"]
+[gd_scene load_steps=23 format=3 uid="uid://vqn6y17pt5mx"]
 
 [ext_resource type="Script" path="res://engine/scripts/nodes/general_movement/general_movement.gd" id="1_ltt83"]
 [ext_resource type="Texture2D" uid="uid://dwtn8cky8tb3l" path="res://engine/objects/enemies/goombas/textures/goomba.png" id="2_8xnig"]
@@ -6,13 +6,13 @@
 [ext_resource type="Script" path="res://engine/objects/enemies/enemy_body_collision.gd" id="2_tm4ve"]
 [ext_resource type="Script" path="res://engine/scripts/resources/instance_node2d/instance_node2d.gd" id="3_5ceaa"]
 [ext_resource type="Texture2D" uid="uid://dt4l713dj8ype" path="res://engine/objects/enemies/goombas/textures/goomba_stamped.png" id="3_bwyev"]
-[ext_resource type="Script" path="res://engine/scripts/nodes/vision/vision.gd" id="3_ccgfb"]
 [ext_resource type="PackedScene" uid="uid://dj2b5g2smonyu" path="res://engine/objects/enemies/_dead/enemy_stomped.tscn" id="3_jc1xp"]
 [ext_resource type="Script" path="res://engine/objects/enemies/_dead/prefabs/do_stomped.gd" id="4_y4itd"]
 [ext_resource type="AudioStream" uid="uid://46ern2rknx3i" path="res://engine/objects/enemies/_sounds/stomp.wav" id="5_7gn8m"]
 [ext_resource type="PackedScene" uid="uid://oe7i3cief0g" path="res://engine/objects/enemies/_dead/enemy_killed.tscn" id="6_xq6j8"]
 [ext_resource type="AudioStream" uid="uid://be3uvqev2c1p6" path="res://engine/objects/players/prefabs/sounds/kick.wav" id="7_sc4cc"]
 [ext_resource type="Script" path="res://engine/objects/enemies/_dead/prefabs/do_killed.gd" id="8_8ylwv"]
+[ext_resource type="Script" path="res://engine/scripts/nodes/vision/activation.gd" id="11_ht63u"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5qxmc"]
 size = Vector2(32, 31)
@@ -54,6 +54,9 @@ custom_vars = {
 "death_speed": Vector2(0, -250)
 }
 custom_script = ExtResource("8_8ylwv")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ned8q"]
+size = Vector2(32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_gtr3k"]
 atlas = ExtResource("2_8xnig")
@@ -122,6 +125,13 @@ killing_scores = 100
 killing_sound_succeeded = ExtResource("7_sc4cc")
 metadata/_edit_pinned_properties_ = [&"stomping_scores", &"stomping_creation", &"stomping_sound", &"killing_creation"]
 
+[node name="Activation" type="Area2D" parent="."]
+visible = false
+script = ExtResource("11_ht63u")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Activation"]
+shape = SubResource("RectangleShape2D_ned8q")
+
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_1e01p")
 autoplay = "default"
@@ -129,11 +139,6 @@ autoplay = "default"
 [node name="Dead" type="Sprite2D" parent="Sprite"]
 visible = false
 texture = ExtResource("3_bwyev")
-
-[node name="VisibleOnScreenEnabler2D" type="VisibleOnScreenEnabler2D" parent="."]
-self_modulate = Color(1, 1, 1, 0.0196078)
-script = ExtResource("3_ccgfb")
-metadata/_edit_lock_ = true
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_hmcac")

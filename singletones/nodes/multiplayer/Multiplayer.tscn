@@ -14,7 +14,7 @@ properties/1/replication_mode = 1
 
 [node name="Multiplayer" type="Node"]
 script = ExtResource("1_1ydqt")
-initial_scene = "res://engine/scenes/multiplayer/test.tscn"
+initial_scene = "res://stages/level_5-1.tscn"
 metadata/_edit_pinned_properties_ = [&"initial_scene"]
 
 [node name="MPGame" type="Node" parent="."]

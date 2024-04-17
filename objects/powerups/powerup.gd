@@ -81,7 +81,8 @@ func collect() -> void:
 	
 	#set_physics_process(false)
 	visible = false
-	#queue_free()
+	if Multiplayer.is_host():
+		Multiplayer.host_free.rpc(get_path())
 
 
 func _change_state_logic(force_powerup: bool, player: Player) -> void:

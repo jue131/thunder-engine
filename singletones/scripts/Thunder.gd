@@ -45,6 +45,11 @@ var _current_hud: CanvasLayer: # Reference to level HUD
 @warning_ignore("unused_private_class_variable")
 var _current_camera: Camera2D
 
+var _current_screen_area: Area2D:
+	get:
+		if !is_instance_valid(_current_screen_area): return null
+		return _current_screen_area
+
 
 ## Gets an [param key] from [param obj], and this won't send any errors if there is no such key in the object
 func get_or_null(obj: Variant, key: String) -> Variant:
@@ -62,6 +67,7 @@ func get_child_by_class_name(ref: Node, classname: String) -> Node:
 ## Connects a signal to a callable without throwing errors if it's already connected
 @warning_ignore("int_as_enum_without_match", "int_as_enum_without_cast")
 func _connect(sig: Signal, callable: Callable, flags: ConnectFlags = 0) -> bool:
+	if callable.is_null() || !callable.is_valid(): return true
 	if sig.is_connected(callable): return true
 	sig.connect(callable, flags)
 	return false
@@ -69,6 +75,7 @@ func _connect(sig: Signal, callable: Callable, flags: ConnectFlags = 0) -> bool:
 
 ## Disconnects a signal from a callable without throwing errors if it's already disconnected
 func _disconnect(sig: Signal, callable: Callable) -> bool:
+	if callable.is_null() || !callable.is_valid(): return true
 	if !sig.is_connected(callable): return true
 	sig.disconnect(callable)
 	return false
@@ -142,6 +149,26 @@ func add_score(count: int):
 ## Pauses game
 func set_pause_game(pause: bool) -> void:
 	get_tree().paused = pause
+
+
+func get_closest_player(to: Vector2) -> Player:
+	return get_closest_node_in_group(to, &"Player", "is_dying")
+
+func get_closest_node_in_group(to: Vector2, group: StringName, exception_prop: String = "") -> Node:
+	var node_array: Array[Node] = get_tree().get_nodes_in_group(group)
+	if node_array.is_empty(): return null
+	
+	var closest_node = null
+	var closest_node_distance: float = 0.0
+	for node: Node in node_array:
+		if exception_prop && node.get(exception_prop) && node[exception_prop] == true:
+			continue
+		var this_node_distance = to.distance_to(node.global_position)
+		if closest_node == null || this_node_distance < closest_node_distance: 
+			closest_node = node
+			closest_node_distance = this_node_distance
+		
+	return closest_node
 
 
 ## Subsingleton of ["engine/singletones/scripts/Thunder.gd"] to majorly manage functions related to screen borders and the detection of them

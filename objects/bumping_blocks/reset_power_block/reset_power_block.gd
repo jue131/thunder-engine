@@ -18,16 +18,17 @@ func _physics_process(delta):
 		_animated_sprite_2d.animation = &"default"
 
 
-@rpc("any_peer", "call_remote", "reliable")
-func got_bumped(by: Node2D) -> void:
+@rpc("any_peer", "call_local", "reliable")
+func got_bumped(is_small: bool) -> void:
 	if _triggered: return
-	call_bump(by)
+	call_bump(is_small)
 
 
-func call_bump(by: Node2D) -> void:
-	bump.rpc(false, 0, by)
+@rpc("any_peer", "call_local", "reliable")
+func call_bump(is_small: bool) -> void:
+	bump.rpc(false, 0, is_small)
 	_animated_sprite_2d.animation = &"empty"
-	if by.is_multiplayer_authority():
+	if multiplayer.get_remote_sender_id() == multiplayer.get_unique_id():
 		var suit_scene: PlayerSuitScene = new_suit.instantiate()
 		Thunder._current_player.change_suit(suit_scene)
 	Data.values.lives = ProjectSettings.get_setting(&"application/thunder_settings/player/default_lives", 4)

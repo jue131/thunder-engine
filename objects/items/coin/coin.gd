@@ -4,15 +4,19 @@ const coin_effect: PackedScene = preload("res://engine/objects/effects/coin_effe
 
 @export var sound: AudioStream = preload("res://engine/objects/items/coin/coin.wav")
 
+@onready var vision: ActivationArea = $Activation
 
 func _from_bumping_block() -> void:
 	Audio.play_sound(sound, self)
 	NodeCreator.prepare_2d(coin_effect, self).create_2d().bind_global_transform()
-	Data.add_coin()
+	if multiplayer.is_server():
+		Data.add_coin()
 	visible = false
 
 
 func _physics_process(delta):
+	if !vision.is_on_screen():
+		return
 	for i in get_tree().get_nodes_in_group(&"Player"):
 		if !is_instance_valid(i): continue
 		if overlaps_body(i) && visible && is_multiplayer_authority():
@@ -30,5 +34,5 @@ func collect() -> void:
 	).create_2d().bind_global_transform()
 	
 	Audio.play_sound(sound, self, false)
-	visible = false
+	Multiplayer.host_free(get_path())
 	#queue_free.call_deferred()

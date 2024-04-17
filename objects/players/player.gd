@@ -147,12 +147,13 @@ func _ready() -> void:
 	
 	change_suit(Thunder._current_player_state, false, true)
 	
-	
 	if !is_starman():
 		sprite.material.set_shader_parameter(&"mixing", false)
 	
 	if Data.values.lives == -1 && death_check_for_lives:
 		Data.values.lives = ProjectSettings.get_setting("application/thunder_settings/player/default_lives", 4)
+	
+	
 
 
 func _initiate_transition() -> void:
@@ -308,8 +309,11 @@ func die(tags: Dictionary = {}) -> void:
 		).create_2d()
 	
 	died.emit()
-	if is_multiplayer_authority():
+	if !Multiplayer.online_play:
 		queue_free()
+	else:
+		set_physics_process(false)
+		suit.process_mode = Node.PROCESS_MODE_DISABLED
 
 
 func is_invincible() -> bool:

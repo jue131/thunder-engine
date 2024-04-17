@@ -9,6 +9,9 @@ class_name GeneralMovementBody2D
 @export var slide: bool
 @export_category("References")
 @export var sprite: NodePath
+@export_category("OnScreenDetection")
+## Set to [code]false[/code] for compatibility. Leave [code]true[/code] to improve performance.
+@export var can_toggle_visibility: bool = true
 
 var dir: int
 var is_activated: bool = false
@@ -34,14 +37,30 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if multiplayer.is_server() && is_activated:
+	if !is_activated:
+		return
+	if Multiplayer.is_host():
 		motion_process(delta, slide)
+		if !Thunder.view.screen_dir(global_position, get_global_gravity_dir(), 800):
+			print("Erasing out of screen: " + name)
+			Multiplayer.host_free(get_path())
+		
 	if turn_sprite && sprite_node && is_instance_valid(sprite_node):
 		sprite_node.flip_h = speed.x < 0
 
 
+func _on_screen_entered() -> void:
+	if is_activated: return
+	if !Multiplayer.is_host(): return
+	
+	set_rpc_activated.rpc(true)
+	if look_at_player && !force_direction:
+		update_dir.call_deferred()
+		speed_to_dir.call_deferred()
+
+
 func update_dir() -> void:
-	var player: Player = Thunder._current_player
+	var player: Player = Thunder.get_closest_player(global_position)
 	if !player: return
 	dir = Thunder.Math.look_at(global_position, player.global_position, global_transform)
 
@@ -50,3 +69,12 @@ func speed_to_dir() -> void:
 
 func set_activated(activate: bool = true) -> void:
 	is_activated = activate
+
+@rpc("authority", "call_local", "reliable")
+func set_rpc_activated(activate: bool = true) -> void:
+	is_activated = activate
+	if can_toggle_visibility: visible = activate
+
+func queue_free_server() -> void:
+	if Multiplayer.is_host():
+		Multiplayer.host_free.rpc(get_path())

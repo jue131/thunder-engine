@@ -1,9 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://bvolo50530iv7"]
+[gd_scene load_steps=9 format=3 uid="uid://bvolo50530iv7"]
 
 [ext_resource type="Script" path="res://engine/objects/enemies/bullet_bill/launcher/bullet_launcher.gd" id="1_3oj3x"]
 [ext_resource type="Texture2D" uid="uid://b25ptq2d2d6g1" path="res://engine/objects/enemies/bullet_bill/launcher/texture/launcher.png" id="1_ud8qb"]
 [ext_resource type="PackedScene" uid="uid://bw7f131nc4fhf" path="res://engine/objects/enemies/bullet_bill/bill/bullet_bill.tscn" id="2_74smt"]
 [ext_resource type="Script" path="res://engine/scripts/resources/instance_node2d/instance_node2d.gd" id="3_axxmi"]
+[ext_resource type="Script" path="res://engine/scripts/nodes/vision/activation.gd" id="5_xss3g"]
 
 [sub_resource type="Resource" id="Resource_b3ipg"]
 script = ExtResource("3_axxmi")
@@ -19,6 +20,9 @@ visi_y_sort_enabled = false
 custom_vars = {}
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_abljg"]
+size = Vector2(32, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oxntn"]
 size = Vector2(32, 32)
 
 [node name="BulletLauncher" type="AnimatableBody2D"]
@@ -41,14 +45,15 @@ metadata/_edit_lock_ = true
 [node name="PosBullet" type="Marker2D" parent="Launcher"]
 visible = false
 
-[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenEnabler2D" parent="."]
-modulate = Color(1, 1, 1, 0.0196078)
-enable_node_path = NodePath("../Interval")
+[node name="Activation" type="Area2D" parent="."]
+visible = false
+script = ExtResource("5_xss3g")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Activation"]
+shape = SubResource("RectangleShape2D_oxntn")
 
 [node name="Interval" type="Timer" parent="."]
 wait_time = 0.25
 one_shot = true
 
-[connection signal="screen_entered" from="VisibleOnScreenNotifier2D" to="." method="_on_screen_entered"]
-[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_screen_exited"]
 [connection signal="timeout" from="Interval" to="." method="_on_bullet_launched"]

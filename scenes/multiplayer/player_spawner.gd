@@ -31,4 +31,7 @@ func spawn_player(data):
 	player.set_player_name(Multiplayer.get_player_name(id).to_upper())
 	if respawned:
 		player.invincible.call_deferred(0.6)
+	
+	if is_multiplayer_authority():# && id != multiplayer.get_unique_id():
+		Multiplayer.game.player_area_spawner.add_area(id)
 	return player

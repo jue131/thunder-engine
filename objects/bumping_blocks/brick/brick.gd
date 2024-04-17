@@ -31,7 +31,7 @@ func bricks_break() -> void:
 			
 	Data.values.score += 10
 	if is_multiplayer_authority():
-		Multiplayer._free.rpc(get_path())
+		Multiplayer.host_free.rpc(get_path())
 
 
 @rpc("any_peer", "call_local", "reliable")
