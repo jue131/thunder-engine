@@ -10,7 +10,7 @@ func _physics_process(delta: float) -> void:
 	if !appear_distance:
 		$Sprite.speed_scale = 5
 
-@rpc
+@rpc("any_peer", "call_local", "reliable")
 func collect() -> void:
 	if appear_distance: return
 	var player = Multiplayer.game.get_player(multiplayer.get_remote_sender_id())

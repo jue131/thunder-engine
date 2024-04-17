@@ -122,11 +122,27 @@ func _lkf():
 ## by the player[br]
 ## If [param offset] set, the actual offset will be [member stomping_offset]
 ## + [param offset]
-func got_stomped(by: Node2D, vel: Vector2, offset: Vector2 = Vector2(0, -2)) -> Dictionary:
+@rpc("any_peer", "call_local", "reliable")
+func got_stomped_server(success: bool) -> void:
+	if !stomping_enabled || _on_killed: return
+	if !_center: return
+	
+	stomped.emit()
+	_on_killed = true
+	if success:
+		stomped_succeeded.emit()
+		if stomping_scores > 0:
+			ScoreText.new(str(stomping_scores), _center)
+			Data.values.score += stomping_scores
+		
+		_creation(stomping_creation)
+	else:
+		stomped_failed.emit()
+
+
+func got_stomped_client(by: Player, vel: Vector2, offset: Vector2 = Vector2(0, -2)) -> Dictionary:
 	var result: Dictionary
-	
 	if !stomping_enabled || _stomping_delayer: return result
-	
 	if !_center:
 		push_error("[No Center Node Error] No _center node set. Please check if you have set the _center node of EnemyAttacked. At " + str(get_path()))
 		return result
@@ -136,15 +152,8 @@ func got_stomped(by: Node2D, vel: Vector2, offset: Vector2 = Vector2(0, -2)) -> 
 	).dot(stomping_standard.rotated(_center.global_rotation))
 	var dotdown: float = vel.dot(stomping_standard.rotated(_center.global_rotation))
 	
-	stomped.emit()
 	if dot > 0 && dotdown >= 0:
 		stomping_delay()
-		stomped_succeeded.emit()
-		if stomping_scores > 0:
-			ScoreText.new(str(stomping_scores), _center)
-			Data.values.score += stomping_scores
-		
-		_creation(stomping_creation)
 		
 		result = {
 			result = true,
@@ -153,8 +162,8 @@ func got_stomped(by: Node2D, vel: Vector2, offset: Vector2 = Vector2(0, -2)) -> 
 		}
 	elif stomping_hurtable:
 		if by is Player && by.is_invincible(): return result
-		stomped_failed.emit()
 		result = {result = false}
+	
 	
 	return result
 

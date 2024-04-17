@@ -79,8 +79,10 @@ func set_player_name(value: String) -> void:
 
 
 func die(tags: Dictionary = {}) -> void:
-	if !is_multiplayer_authority():
+	if str(multiplayer.get_unique_id()) != str(name):
 		return
+	if warp != Warp.NONE: return
+	if is_dying: return
 	
 	Multiplayer.game.player_died.rpc(str(name).to_int())
 	Multiplayer.game.chat_message.emit("You died!")

@@ -233,3 +233,9 @@ func switch_spectating_player() -> void:
 			pl_lives # Lives
 		]
 		Multiplayer.mp_layer.spectator.visible = true
+
+
+#@rpc("any_peer", "call_local", "reliable")
+#func enemy_stomp(enemy_attacked: NodePath, success: bool) -> void:
+#	if multiplayer.get_unique_id() != get_multiplayer_authority(): return # Only for host
+#	get_node(enemy_attacked).got_stomped_server.rpc(success)

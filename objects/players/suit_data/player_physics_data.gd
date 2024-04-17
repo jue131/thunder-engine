@@ -31,12 +31,13 @@ func _physics_process(delta: float) -> void:
 	_shape_process()
 	if player.warp != Player.Warp.NONE: return
 	
-	# Head
-	_head_process()
-	# Body
-	_body_process()
-	# Floor
-	_floor_process()
+	if (!Multiplayer.online_play || str(multiplayer.get_unique_id()) == str(player.name)):
+		# Head
+		_head_process()
+		# Body
+		_body_process()
+		# Floor
+		_floor_process()
 	# Movement
 	if player.is_climbing:
 		_movement_climbing(delta)
@@ -294,14 +295,22 @@ func _body_process() -> void:
 		if !collider.has_node("EnemyAttacked"): continue
 		
 		var enemy_attacked: Node = collider.get_node("EnemyAttacked")
-		var result: Dictionary = enemy_attacked.got_stomped(player, player.velocity.normalized())
+		#enemy_attacked.got_stomped_server.rpc(player.velocity.normalized())
+		var result: Dictionary = enemy_attacked.got_stomped_client(player, player.velocity.normalized())
 		if result.is_empty(): return
 		if result.result == true:
+			Multiplayer.call_to_server.rpc_id(
+				get_multiplayer_authority(), enemy_attacked.get_path(), &"got_stomped_server", true
+			)
 			if player.jumping > 0:
 				player.speed.y = -result.jumping_max * config.jump_stomp_multiplicator
 			else:
 				player.speed.y = -result.jumping_min * config.jump_stomp_multiplicator
 		else:
+			#Multiplayer.game.enemy_stomp.rpc(enemy_attacked.get_path(), false)
+			Multiplayer.call_to_server.rpc_id(
+				get_multiplayer_authority(), enemy_attacked.get_path(), &"got_stomped_server", false
+			)
 			player.hurt(enemy_attacked.get_meta(&"stomp_tags", {}))
 
 #= Floor

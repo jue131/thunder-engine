@@ -70,8 +70,8 @@ func _player_disconnected(id):
 			game.chat_message.emit("Player " + players[id] + " disconnected")
 			# Unregister this player.
 			unregister_player(id)
-			var players = get_tree().get_nodes_in_group(&"Player")
-			for i in players:
+			var pls = get_tree().get_nodes_in_group(&"Player")
+			for i in pls:
 				if str(i.name) == str(id):
 					i.queue_free()
 			#end_game()
@@ -268,3 +268,13 @@ func host_free(node_path: NodePath) -> void:
 	var node = get_node_or_null(node_path)
 	if is_instance_valid(node):
 		node.queue_free()
+
+
+@rpc("any_peer", "call_local", "reliable")
+func call_to_server(node_path: NodePath, method_name: StringName, argument: Variant) -> void:
+	if !node_path: return
+	assert(!argument is Object, "Passing objects in arguments is not supported")
+	#if multiplayer.get_unique_id() != get_multiplayer_authority(): return
+	var node = get_node_or_null(node_path)
+	if is_instance_valid(node):
+		node.rpc(method_name, argument)

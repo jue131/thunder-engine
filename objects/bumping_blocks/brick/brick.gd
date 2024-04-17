@@ -8,6 +8,7 @@ const NULL_TEXTURE = preload("res://engine/scripts/classes/bumping_block/texture
 @export var result_counter_value: float = 300
 var counter_enabled: bool = false
 
+var broken: bool
 
 func _physics_process(_delta):
 	if !is_multiplayer_authority():
@@ -49,9 +50,10 @@ func got_bumped(is_small: bool) -> void:
 	# Standard brick
 	if is_small:
 		bump.rpc(false, 0, true)
-	else:
+	elif !broken:
 		hit_attack()
 		bricks_break()
+		broken = true
 	
 
 @rpc("any_peer", "call_local", "reliable")
