@@ -152,7 +152,7 @@ func _on_attack_timeout() -> void:
 			NodeCreator.prepare_ins_2d(projectile, self).call_method(
 				func(proj: Node2D) -> void:
 					proj.set(&"belongs_to", Data.PROJECTILE_BELONGS.ENEMY)
-			).execute_instance_script({bro = self}).create_2d().bind_global_transform(pos_attack.position)
+			).execute_instance_script({bro = self}).create_2d(true, null, true).bind_global_transform(pos_attack.position)
 			Audio.play_sound(sound, self, false)
 
 

@@ -3,6 +3,7 @@ extends Projectile
 const explosion_effect = preload("res://engine/objects/effects/explosion/explosion.tscn")
 
 @onready var vision: VisibleOnScreenNotifier2D = $VisibleOnScreenNotifier2D
+@onready var activation: ActivationArea = $Activation
 @export var jumping_speed: float = -250.0
 
 
@@ -11,7 +12,7 @@ func _ready() -> void:
 	await get_tree().physics_frame
 	if (
 		belongs_to == Data.PROJECTILE_BELONGS.ENEMY &&
-		!vision.is_on_screen()
+		!activation.is_on_screen()
 	):
 		queue_free()
 

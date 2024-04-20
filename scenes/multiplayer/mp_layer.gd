@@ -4,6 +4,8 @@ extends CanvasLayer
 @onready var spectator: Label = $Spectator
 @onready var enter_msg: LineEdit = $EnterMsg
 @onready var lives: Label = $Lives
+@onready var ping: Label = $Ping
+@onready var timer: Timer = $Timer
 
 @onready var default_spectator_text: String = spectator.text
 var force_highlight_chat: bool = false
@@ -14,6 +16,8 @@ var entering_message: bool = false
 
 func _ready() -> void:
 	Thunder._connect(Multiplayer.game.chat_message, _print_system_message)
+	Thunder._connect(Multiplayer.ping_latency, _receive_ping)
+	timer.timeout.connect(_on_ping_sent)
 
 func _physics_process(delta) -> void:
 	_update_lives_count()
@@ -59,6 +63,14 @@ func _update_lives_count() -> void:
 	lives.text = ""
 	for i in Multiplayer.game.data_nodes.get_children():
 		lives.text += str(i.lives) + "\n"
+
+var old_time: int
+func _on_ping_sent() -> void:
+	old_time = Time.get_ticks_msec()
+	Multiplayer.host_ping.rpc_id(get_multiplayer_authority())
+
+func _receive_ping() -> void:
+	ping.text = str(Time.get_ticks_msec() - old_time)
 
 
 func _print_system_message(text) -> void:

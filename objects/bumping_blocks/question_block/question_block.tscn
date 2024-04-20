@@ -28,7 +28,7 @@ result = ExtResource("2_3xrsj")
 metadata/_edit_pinned_properties_ = [&"result"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-process_mode = 3
+process_mode = 1
 visible = false
 shape = SubResource("RectangleShape2D_2x2nd")
 
@@ -49,7 +49,7 @@ metadata/_edit_lock_ = true
 occluder = SubResource("OccluderPolygon2D_fygbc")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Sprites"]
-process_mode = 3
+process_mode = 1
 sprite_frames = ExtResource("2_t2orr")
 autoplay = "default"
 

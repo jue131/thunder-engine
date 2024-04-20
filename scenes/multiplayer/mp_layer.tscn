@@ -197,5 +197,31 @@ offset_right = 624.0
 offset_bottom = 256.0
 horizontal_alignment = 2
 
+[node name="Ping" type="Label" parent="."]
+self_modulate = Color(1, 1, 1, 0.5)
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 604.0
+offset_top = -480.0
+offset_right = -4.0
+offset_bottom = -431.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(1, 0.65)
+theme_override_colors/font_outline_color = Color(0, 0, 0.372549, 1)
+theme_override_constants/outline_size = 8
+theme_override_constants/line_spacing = 0
+theme_override_fonts/font = ExtResource("2_8p0cs")
+theme_override_font_sizes/font_size = 22
+text = "-"
+horizontal_alignment = 2
+text_overrun_behavior = 1
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.66
+autostart = true
+
 [connection signal="focus_entered" from="EnterMsg" to="." method="_on_enter_msg_focus_entered"]
 [connection signal="focus_exited" from="EnterMsg" to="." method="_on_enter_msg_focus_exited"]

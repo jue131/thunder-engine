@@ -64,6 +64,12 @@ func get_child_by_class_name(ref: Node, classname: String) -> Node:
 	return null
 
 
+func get_node_or_not(path: NodePath) -> Node:
+	if has_node(path):
+		return get_node(path)
+	return null
+
+
 ## Connects a signal to a callable without throwing errors if it's already connected
 @warning_ignore("int_as_enum_without_match", "int_as_enum_without_cast")
 func _connect(sig: Signal, callable: Callable, flags: ConnectFlags = 0) -> bool:

@@ -19,7 +19,7 @@ sync_to_physics = false
 script = ExtResource("1_5y3xv")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-process_mode = 3
+process_mode = 1
 visible = false
 shape = SubResource("RectangleShape2D_2x2nd")
 

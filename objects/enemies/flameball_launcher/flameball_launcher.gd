@@ -28,7 +28,7 @@ func _on_interval_timeout() -> void:
 
 func _on_interval_flame_timeout() -> void:
 	_amount -= 1
-	NodeCreator.prepare_ins_2d(flameball, pos_flameball).bind_global_transform().create_2d().call_method(
+	NodeCreator.prepare_ins_2d(flameball, pos_flameball).bind_global_transform().create_2d(true, null, true).call_method(
 		func(ball: Node2D) -> void:
 			if ball is Projectile:
 				ball.global_rotation = 0

@@ -168,7 +168,7 @@ func attack(state: StringName) -> void:
 # Bowser's flame
 func attack_flame(offset_by_32: int = -1) -> void:
 	if !flame: return
-	NodeCreator.prepare_ins_2d(flame, self).create_2d().call_method(
+	NodeCreator.prepare_ins_2d(flame, self).create_2d(true, null, true).call_method(
 		func(flm: Node2D) -> void:
 			flm.to_pos_y = pos_y_on_floor + 16 - 32 * (randi_range(0, 4) if offset_by_32 < 0 else offset_by_32)
 			flm.global_position = pos_flame.global_position
@@ -207,7 +207,7 @@ func attack_hammer() -> void:
 				if !hammer: return
 				
 				Audio.play_sound(hammer_sound, self, false)
-				NodeCreator.prepare_ins_2d(hammer, self).create_2d().call_method(
+				NodeCreator.prepare_ins_2d(hammer, self).create_2d(true, null, true).call_method(
 					func(hm: Node2D) -> void:
 						hm.global_position = pos_hammer.global_position
 						if hm is Projectile:
@@ -255,7 +255,7 @@ func attack_burst() -> void:
 				if !burst_fireball: return
 				
 				Audio.play_sound(burst_sound, self, false)
-				NodeCreator.prepare_ins_2d(burst_fireball, self).create_2d().call_method(
+				NodeCreator.prepare_ins_2d(burst_fireball, self).create_2d(true, null, true).call_method(
 					func(bf: Node2D) -> void:
 						bf.global_position = pos_flame.global_position
 						if bf is Projectile:
@@ -323,7 +323,7 @@ func bullet_hurt() -> void:
 func die() -> void:
 	Audio.play_sound(death_sound, self)
 	if trigger.has_method(&"stop_music"): trigger.stop_music()
-	NodeCreator.prepare_2d(CORPSE, self).bind_global_transform().create_2d().call_method(
+	NodeCreator.prepare_2d(CORPSE, self).bind_global_transform().create_2d(true, null, true).call_method(
 		func(cps: Node2D) -> void:
 			var spr: AnimatedSprite2D = sprite.duplicate()
 			cps.add_child(spr)

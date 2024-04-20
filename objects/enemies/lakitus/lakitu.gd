@@ -81,7 +81,7 @@ func _leaving_process(delta: float) -> void:
 
 func _pitch() -> void:
 	if pitched:
-		NodeCreator.prepare_ins_2d(pitched, self).create_2d().execute_instance_script()
+		NodeCreator.prepare_ins_2d(pitched, self).create_2d(true, null, true).execute_instance_script()
 	Audio.play_sound(sounds.pick_random(), self)
 
 

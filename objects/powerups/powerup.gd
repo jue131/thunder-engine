@@ -35,11 +35,12 @@ func _from_bumping_block() -> void:
 	Audio.play_sound(appearing_sound, self)
 
 func _physics_process(delta: float) -> void:
-	if !supply_behavior && multiplayer.is_server():
+	if !supply_behavior:
 		if !appear_distance:
-			motion_process(delta, slide)
-			modulate.a = 1
-			z_index = 0
+			if multiplayer.is_server():
+				motion_process(delta, slide)
+				modulate.a = 1
+				z_index = 0
 		else:
 			appear_process(Thunder.get_delta(delta))
 			z_index = -1

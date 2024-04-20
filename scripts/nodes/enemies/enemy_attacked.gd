@@ -100,6 +100,7 @@ signal killed_failed
 signal attack_custom_signal
 
 var _on_killed: bool # To prevent multiple creation by multiple attackers
+var _on_killed_server: bool
 
 
 func _ready() -> void:
@@ -118,11 +119,7 @@ func _lkf():
 	Audio.play_sound(killing_sound_failed, _center, false, {pitch = sound_pitch})
 
 
-## Makes the enemy stomped by the player, usually triggered
-## by the player[br]
-## If [param offset] set, the actual offset will be [member stomping_offset]
-## + [param offset]
-@rpc("any_peer", "call_local", "reliable")
+@rpc("authority", "call_local", "reliable")
 func got_stomped_server(success: bool) -> void:
 	if !stomping_enabled || _on_killed: return
 	if !_center: return
@@ -140,6 +137,10 @@ func got_stomped_server(success: bool) -> void:
 		stomped_failed.emit()
 
 
+## Makes the enemy stomped by the player, usually triggered
+## by the player[br]
+## If [param offset] set, the actual offset will be [member stomping_offset]
+## + [param offset]
 func got_stomped_client(by: Player, vel: Vector2, offset: Vector2 = Vector2(0, -2)) -> Dictionary:
 	var result: Dictionary
 	if !stomping_enabled || _stomping_delayer: return result
@@ -164,8 +165,32 @@ func got_stomped_client(by: Player, vel: Vector2, offset: Vector2 = Vector2(0, -
 		if by is Player && by.is_invincible(): return result
 		result = {result = false}
 	
-	
 	return result
+
+
+@rpc("authority", "call_local", "reliable")
+func got_killed_server(args: Array = [true, [], true]) -> void:
+	if !killing_enabled || _on_killed_server: 
+		return
+	
+	if !args[0]:
+		if args[2]:
+			killed_failed.emit()
+	else:
+		killed_succeeded.emit()
+		
+		_creation(killing_creation)
+		
+		var no_score: bool = &"no_score" in args[1]
+		if killing_scores > 0 && !no_score:
+			ScoreText.new(str(killing_scores), _center)
+			Data.values.score += killing_scores
+	
+	# Reset _on_killed status to allow killing
+	get_tree().physics_frame.connect(func():
+		_on_killed = false
+		_on_killed_server = false
+	, CONNECT_ONE_SHOT)
 
 
 ## Makes the enemy killed by a certain attacker[br]
@@ -174,32 +199,21 @@ func got_stomped_client(by: Player, vel: Vector2, offset: Vector2 = Vector2(0, -
 func got_killed(by: StringName, special_tags: Array = [], trigger_killed_failed: bool = true) -> Dictionary:
 	var result: Dictionary
 	
-	if !killing_enabled || !by in killing_immune || _on_killed: 
+	if !killing_enabled || !by in killing_immune || _on_killed || _on_killed_server: 
 		return result
 	
 	_on_killed = true
 	var shell_attack := false
 	
 	if killing_immune[by]:
-		if trigger_killed_failed:
-			killed_failed.emit()
-		
 		result = {
 			result = false,
 			attackee = self
 		}
+		Multiplayer.call_to_server.rpc_id(get_multiplayer_authority(), get_path(), "got_killed_server", [false, special_tags, trigger_killed_failed])
 	else:
 		if &"shell_attack" in special_tags:
 			shell_attack = true
-		
-		killed_succeeded.emit()
-		
-		_creation(killing_creation)
-		
-		var no_score: bool = &"no_score" in special_tags
-		if killing_scores > 0 && !no_score:
-			ScoreText.new(str(killing_scores), _center)
-			Data.values.score += killing_scores
 		
 		result = {
 			result = true,
@@ -207,11 +221,7 @@ func got_killed(by: StringName, special_tags: Array = [], trigger_killed_failed:
 		}
 		if shell_attack:
 			result.type = &"shell"
-	
-	# Reset _on_killed status to allow killing
-	get_tree().physics_frame.connect(func():
-		_on_killed = false
-	, CONNECT_ONE_SHOT)
+		Multiplayer.call_to_server.rpc_id(get_multiplayer_authority(), get_path(), "got_killed_server", [true, special_tags, trigger_killed_failed])
 	
 	return result
 
@@ -222,7 +232,7 @@ func _creation(creation: InstanceNode2D) -> void:
 	var vars: Dictionary = {
 		enemy_attacked = self,
 	}
-	NodeCreator.prepare_ins_2d(creation, _center).execute_instance_script(vars).create_2d()
+	NodeCreator.prepare_ins_2d(creation, _center).execute_instance_script(vars).create_2d(true, null, true)
 
 
 func stomping_delay() -> void:

@@ -58,7 +58,7 @@ func get_custom_sprite_frames(old_sprites: SpriteFrames, skin_name: String, p_id
 	
 	custom_tex = peer_custom_textures[p_id][skin_name]
 	var new_sprites: SpriteFrames = new_custom_sprite_frames(old_sprites, custom_tex)
-	if peer_custom_sprite_frames.is_empty():
+	if !peer_custom_sprite_frames.has(p_id):
 		peer_custom_sprite_frames[p_id] = {}
 	peer_custom_sprite_frames[p_id][skin_name] = new_sprites
 	return new_sprites

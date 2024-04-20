@@ -1,11 +1,14 @@
-[gd_scene load_steps=10 format=3 uid="uid://12ak5pa7cf8u"]
+[gd_scene load_steps=11 format=3 uid="uid://12ak5pa7cf8u"]
 
 [ext_resource type="Script" path="res://engine/objects/powerups/super_star/super_star.gd" id="1_4vonc"]
 [ext_resource type="Texture2D" uid="uid://crq3fax60u2kt" path="res://engine/objects/powerups/super_star/texture.png" id="2_i7lwt"]
-[ext_resource type="Script" path="res://engine/scripts/nodes/vision/vision.gd" id="3_o2iew"]
+[ext_resource type="Script" path="res://engine/scripts/nodes/vision/activation.gd" id="2_ksjb6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oxynq"]
 size = Vector2(31, 31)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_n1s18"]
+size = Vector2(32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_v7xci"]
 atlas = ExtResource("2_i7lwt")
@@ -67,13 +70,15 @@ visible = false
 shape = SubResource("RectangleShape2D_oxynq")
 debug_color = Color(0, 0.643137, 0.309804, 0.419608)
 
+[node name="Activation" type="Area2D" parent="."]
+visible = false
+script = ExtResource("2_ksjb6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Activation"]
+shape = SubResource("RectangleShape2D_n1s18")
+
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_65afj")
 autoplay = "default"
-
-[node name="VisibleOnScreenEnabler2D" type="VisibleOnScreenEnabler2D" parent="."]
-self_modulate = Color(1, 1, 1, 0.0196078)
-script = ExtResource("3_o2iew")
-metadata/_edit_lock_ = true
 
 [connection signal="collided_wall" from="." to="." method="turn_x"]

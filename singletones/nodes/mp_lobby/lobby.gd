@@ -1,6 +1,6 @@
 extends Control
 
-@onready var connect: Panel = $Connect
+@onready var connect_panel: Panel = $Connect
 @onready var connect_name: LineEdit = $Connect/Name
 @onready var ip_address: LineEdit = $Connect/IPAddress
 @onready var error_label: Label = $Connect/ErrorLabel
@@ -33,7 +33,7 @@ func _on_host_pressed():
 	var ok = Multiplayer.host_game(player_name)
 	if !ok: return
 
-	connect.hide()
+	connect_panel.hide()
 	players.show()
 	error_label.text = ""
 
@@ -69,7 +69,7 @@ func name_check(new_name: String) -> bool:
 
 
 func _on_connection_success():
-	connect.hide()
+	connect_panel.hide()
 	timer.stop()
 	players.show()
 
@@ -82,7 +82,7 @@ func _on_connection_failed():
 
 func _on_game_ended():
 	show()
-	connect.show()
+	connect_panel.show()
 	players.hide()
 	btn_host.disabled = false
 	btn_join.disabled = false

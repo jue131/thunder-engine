@@ -44,7 +44,7 @@ func _kill_enemy() -> void:
 		if !enemy_attacked: continue
 		
 		enemy_attacked.set_meta(&"attacker_speed", velocity)
-		result = await enemy_attacked.got_killed(
+		result = enemy_attacked.got_killed(
 			killer_type, special_tags, trigger_enemy_failed_signal
 		)
 	if result.is_empty(): return
@@ -68,8 +68,9 @@ func _hurt_player() -> void:
 		var ins:PhysicsBody2D = get_collider(i) as PhysicsBody2D
 		if !ins: continue
 		elif ins is Player:
+			
 			if (
-				"suit" in ins && ins.suit &&
+				"player_suit" in ins && ins.player_suit &&
 				"crouch_reflect_fireballs" in ins.player_suit.behavior_script &&
 				ins.player_suit.behavior_script._crouch_reflect_fireballs == true &&
 				ins.is_crouching == true

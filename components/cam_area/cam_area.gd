@@ -45,8 +45,11 @@ func _physics_process(_delta: float) -> void:
 	var rect = get_rect().abs()
 	
 	var is_in_bounds: bool = (
-		camera.has_meta(&"cam_area") && 
-		camera.get_meta(&"cam_area", null) != self && 
+		(
+			(camera.has_meta(&"cam_area") && 
+			camera.get_meta(&"cam_area", null) != self) ||
+			!camera.has_meta(&"cam_area")
+		) && 
 		camera.position.x > rect.position.x &&
 		camera.position.y > rect.position.y &&
 		camera.position.x < rect.end.x &&

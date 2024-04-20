@@ -20,8 +20,7 @@ func spawn_player(data):
 	elif data is int:
 		id = data
 	var player = Multiplayer.game.PLAYER.instantiate()
-	var had_data: bool = Multiplayer.game.has_player_data(id)
-	var p_data = Multiplayer.game.add_player_data(id)
+	Multiplayer.game.add_player_data(id)
 	#if !had_data:
 	#	p_data.lives = 4
 	

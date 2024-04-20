@@ -4,7 +4,6 @@ class_name SuitAnimationData
 const _default_animation_sprites: SpriteFrames = preload("res://engine/objects/players/prefabs/animations/mario/animation_mario_small.tres")
 @export var sprites: SpriteFrames = _default_animation_sprites
 
-#var sprite: AnimatedSprite2D
 var config: PlayerConfig
 var only_once: bool
 var _climb_progress: float
@@ -23,22 +22,8 @@ func _ready_mixin(pl: Player) -> void:
 	Thunder._connect(sprite.animation_finished, _sprite_finish)
 
 
-#func _exit_tree_mixin() -> void:
-#	# Disconnect animation signals from the current powerup
-#	Thunder._disconnect(player.suit_appeared, _suit_appeared)
-#	Thunder._disconnect(player.swam, _swam)
-#	Thunder._disconnect(player.shot, _shot)
-#	Thunder._disconnect(player.invinciblized, _invincible)
-#	
-#	Thunder._disconnect(sprite.animation_looped, _sprite_loop)
-#	Thunder._disconnect(sprite.animation_finished, _sprite_finish)
-
-
 func _physics_process(delta: float) -> void:
 	super(delta)
-	#if player.get_tree().paused: return
-	
-	#delta = player.get_physics_process_delta_time()
 	if !is_instance_valid(player): return
 	_animation_process(delta)
 

@@ -1,12 +1,15 @@
-[gd_scene load_steps=19 format=3 uid="uid://o3k018cbex8g"]
+[gd_scene load_steps=20 format=3 uid="uid://o3k018cbex8g"]
 
 [ext_resource type="Script" path="res://engine/objects/powerups/green_lui/green_lui.gd" id="1_w0eyt"]
 [ext_resource type="PackedScene" uid="uid://dpt1hnjkbbjrt" path="res://engine/objects/players/prefabs/suits/mario/green_lui_mario_suit.tscn" id="2_v13u4"]
 [ext_resource type="Texture2D" uid="uid://skeuracpsv2p" path="res://engine/objects/powerups/green_lui/texture.png" id="3_7ksfc"]
-[ext_resource type="Script" path="res://engine/scripts/nodes/vision/vision.gd" id="4_wvem1"]
+[ext_resource type="Script" path="res://engine/scripts/nodes/vision/activation.gd" id="3_irgi5"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_w2yun"]
 size = Vector2(31, 31)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_63v3l"]
+size = Vector2(32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_mndcc"]
 atlas = ExtResource("3_7ksfc")
@@ -127,14 +130,16 @@ visible = false
 shape = SubResource("RectangleShape2D_w2yun")
 debug_color = Color(0, 0.643137, 0.309804, 0.419608)
 
+[node name="Activation" type="Area2D" parent="."]
+visible = false
+script = ExtResource("3_irgi5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Activation"]
+shape = SubResource("RectangleShape2D_63v3l")
+
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_nlhr2")
 autoplay = "default"
-
-[node name="VisibleOnScreenEnabler2D" type="VisibleOnScreenEnabler2D" parent="."]
-self_modulate = Color(1, 1, 1, 0.0196078)
-script = ExtResource("4_wvem1")
-metadata/_edit_lock_ = true
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
 bus = &"Sound"

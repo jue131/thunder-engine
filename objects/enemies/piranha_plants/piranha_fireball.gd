@@ -64,7 +64,7 @@ func _shoot() -> void:
 			
 			if &"vision" in ball:
 				ball.expand_vision(Vector2(8, 8))
-		).create_2d()
+		).create_2d(true, null, true)
 	
 	Audio.play_sound(vars.attack_sound, node, false)
 	

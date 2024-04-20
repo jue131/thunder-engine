@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://bw7f131nc4fhf"]
+[gd_scene load_steps=15 format=3 uid="uid://bw7f131nc4fhf"]
 
 [ext_resource type="Script" path="res://engine/scripts/nodes/general_movement/general_movement.gd" id="1_w3yqm"]
 [ext_resource type="Texture2D" uid="uid://c4ty5fuc65vlg" path="res://engine/objects/enemies/bullet_bill/bill/textures/bullet_bill.png" id="2_2h53c"]
@@ -9,6 +9,7 @@
 [ext_resource type="AudioStream" uid="uid://be3uvqev2c1p6" path="res://engine/objects/players/prefabs/sounds/kick.wav" id="6_dxe3u"]
 [ext_resource type="AudioStream" uid="uid://46ern2rknx3i" path="res://engine/objects/enemies/_sounds/stomp.wav" id="6_v7ft1"]
 [ext_resource type="AudioStream" uid="uid://c162tqddc8eej" path="res://engine/objects/bumping_blocks/_sounds/bump.wav" id="8_fhq1h"]
+[ext_resource type="Script" path="res://engine/scripts/nodes/vision/activation.gd" id="9_atqty"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s4qhu"]
 size = Vector2(32, 28)
@@ -28,6 +29,9 @@ custom_vars = {
 "death": NodePath("../../Sprite")
 }
 custom_script = ExtResource("4_ik838")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_d18fy"]
+size = Vector2(512, 512)
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_wyspk"]
 properties/0/path = NodePath(".:speed")
@@ -78,18 +82,20 @@ killing_sound_succeeded = ExtResource("6_dxe3u")
 killing_sound_failed = ExtResource("8_fhq1h")
 metadata/_edit_pinned_properties_ = [&"stomping_sound", &"stomping_creation", &"killing_creation", &"killing_scores", &"stomping_scores", &"killing_sound_failed", &"killing_sound_succeeded", &"killing_immune"]
 
+[node name="Activation" type="Area2D" parent="."]
+visible = false
+script = ExtResource("9_atqty")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Activation"]
+shape = SubResource("RectangleShape2D_d18fy")
+
 [node name="Sprite" type="Sprite2D" parent="."]
 z_index = 1
 texture = ExtResource("2_2h53c")
 
-[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
-modulate = Color(1, 1, 1, 0.0196078)
-rect = Rect2(-256, -256, 512, 512)
-
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_wyspk")
 
-[connection signal="killed_succeeded" from="Body/EnemyAttacked" to="." method="queue_free" flags=3]
-[connection signal="stomped_succeeded" from="Body/EnemyAttacked" to="." method="queue_free" flags=3]
-[connection signal="screen_entered" from="VisibleOnScreenNotifier2D" to="." method="set_activated"]
-[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="queue_free"]
+[connection signal="killed_succeeded" from="Body/EnemyAttacked" to="." method="queue_free_server" flags=3]
+[connection signal="stomped_succeeded" from="Body/EnemyAttacked" to="." method="queue_free_server" flags=3]
+[connection signal="screen_exited" from="Activation" to="." method="queue_free_server"]

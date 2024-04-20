@@ -7,6 +7,7 @@ extends AnimatableBody2D
 @export var bullet_speed: float = 162.5
 @export_group("Shooting")
 @export var stop_shooting_radius: float = 80
+@export var stop_shooting_box_shape: bool = false
 @export var first_shooting_delay: float = 0.5
 @export var shooting_delay_min: float = 1.5
 @export var shooting_delay_max: float = 4.5
@@ -34,9 +35,16 @@ func _mp_bullet_launched() -> void:
 	
 	if player.completed: return
 	
-	if player.global_position.distance_squared_to(global_position) <= stop_shooting_radius ** 2:
-		interval.start(0.1)
-		return
+	if stop_shooting_box_shape:
+		if player.global_position.distance_squared_to(global_position) <= stop_shooting_radius ** 2:
+			interval.start(0.1)
+			return
+	else:
+		var bullet_pos := global_transform.affine_inverse().basis_xform(global_position)
+		var player_pos := global_transform.affine_inverse().basis_xform(player.global_position)
+		if player_pos.x > bullet_pos.x - stop_shooting_radius && player_pos.x < bullet_pos.x + stop_shooting_radius:
+			interval.start(0.1)
+			return
 	
 	var dir: int = Thunder.Math.look_at(pos_bullet.global_position, player.global_position, pos_bullet.global_transform)
 	Audio.play_sound(
@@ -44,7 +52,7 @@ func _mp_bullet_launched() -> void:
 			"pitch": randf_range(sound_pitch_min, sound_pitch_max)
 		}
 	)
-	NodeCreator.prepare_ins_2d(bullet_bill, self).create_2d().call_method(
+	NodeCreator.prepare_ins_2d(bullet_bill, self).create_2d(true, null, true).call_method(
 		func(bul: Node2D) -> void:
 			bul.global_transform = pos_bullet.global_transform
 			if bul is GeneralMovementBody2D:

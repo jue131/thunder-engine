@@ -109,7 +109,8 @@ func bump(disable: bool, bump_rotation: float = 0, is_small: bool = false):
 		Audio.play_sound(bump_sound, self)
 	
 	bumped.emit()
-	hit_attack()
+	if Multiplayer.is_host():
+		hit_attack()
 
 func _lt(disable):
 	if !disable:
@@ -119,7 +120,7 @@ func _creation(creation: InstanceNode2D) -> void:
 	if !creation: return
 	
 	var created: Node2D = NodeCreator.prepare_ins_2d(creation, self) \
-		.execute_instance_script({}, &"_pre_ready").create_2d() \
+		.execute_instance_script({}, &"_pre_ready").create_2d(true, null, true) \
 		.execute_instance_script({}, &"_after_ready").get_node()
 	if created && created.has_method(&"_from_bumping_block"): created._from_bumping_block()
 	

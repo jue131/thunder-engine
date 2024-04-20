@@ -306,12 +306,13 @@ func die(tags: Dictionary = {}) -> void:
 					var dsdup: Node2D = death_sprite.duplicate()
 					db.add_child(dsdup)
 					dsdup.visible = true
-		).create_2d()
+		).create_2d(true, null, true)
 	
 	died.emit()
 	if !Multiplayer.online_play:
 		queue_free()
 	else:
+		visible = false
 		set_physics_process(false)
 		suit.process_mode = Node.PROCESS_MODE_DISABLED
 
@@ -346,6 +347,5 @@ func _on_starman_killed(what: Node, result: Dictionary) -> void:
 	if result.result:
 		if !starman_combo.get_combo() <= 0:
 			what.sound_pitch = 1 + starman_combo.get_combo() * 0.135
-		#what.got_killed(&"starman", [&"no_score"])
 		starman_combo.combo()
 

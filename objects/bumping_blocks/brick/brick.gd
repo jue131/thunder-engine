@@ -51,7 +51,8 @@ func got_bumped(is_small: bool) -> void:
 	if is_small:
 		bump.rpc(false, 0, true)
 	elif !broken:
-		hit_attack()
+		if Multiplayer.is_host():
+			hit_attack()
 		bricks_break()
 		broken = true
 	

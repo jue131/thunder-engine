@@ -41,6 +41,7 @@ signal connection_failed()
 signal connection_succeeded()
 signal game_ended()
 signal game_error(what)
+signal ping_latency()
 
 
 func _ready():
@@ -265,16 +266,27 @@ func is_host() -> bool:
 @rpc("authority", "call_local", "reliable")
 func host_free(node_path: NodePath) -> void:
 	if !node_path: return
+	print(node_path)
 	var node = get_node_or_null(node_path)
-	if is_instance_valid(node):
-		node.queue_free()
+	if node && is_instance_valid(node):
+		node.queue_free.call_deferred()
 
 
 @rpc("any_peer", "call_local", "reliable")
 func call_to_server(node_path: NodePath, method_name: StringName, argument: Variant) -> void:
 	if !node_path: return
 	assert(!argument is Object, "Passing objects in arguments is not supported")
-	#if multiplayer.get_unique_id() != get_multiplayer_authority(): return
 	var node = get_node_or_null(node_path)
 	if is_instance_valid(node):
 		node.rpc(method_name, argument)
+
+
+@rpc("any_peer", "call_local", "reliable", 11)
+func host_ping() -> void:
+	var p_id = multiplayer.get_remote_sender_id()
+	receive_ping.rpc_id(p_id)
+	
+	
+@rpc("authority", "call_local", "reliable", 12)
+func receive_ping() -> void:
+	ping_latency.emit()

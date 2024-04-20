@@ -25,7 +25,7 @@ func _physics_process(delta: float) -> void:
 	
 	
 	if collision_enabled && is_on_floor():
-		NodeCreator.prepare_ins_2d(spiny_creation, self).create_2d().call_method(func(node):
+		NodeCreator.prepare_ins_2d(spiny_creation, self).create_2d(true, null, true).call_method(func(node):
 			
 			var spr = node.get_node(node.sprite)
 			if spr.sprite_frames.has_animation(&"appear"):

@@ -35,6 +35,8 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	super(delta)
+	if !Multiplayer.is_host():
+		motion_process(delta, slide)
 	
 	if sprite_node:
 		if _rotating_dir && _fancy_effects_enabled():
