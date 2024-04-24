@@ -51,7 +51,9 @@ func _physics_process(delta: float) -> void:
 
 func _on_screen_entered() -> void:
 	if is_activated: return
-	if !Multiplayer.is_host(): return
+	if !Multiplayer.is_host():
+		
+		return
 	
 	set_rpc_activated.rpc(true)
 	if look_at_player && !force_direction:

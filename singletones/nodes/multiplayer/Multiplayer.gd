@@ -290,3 +290,9 @@ func host_ping() -> void:
 @rpc("authority", "call_local", "reliable", 12)
 func receive_ping() -> void:
 	ping_latency.emit()
+
+
+@rpc("authority", "call_local", "reliable", 10)
+func is_ghost_object(node_path: NodePath):
+	var sender: int = multiplayer.get_remote_sender_id()
+	
