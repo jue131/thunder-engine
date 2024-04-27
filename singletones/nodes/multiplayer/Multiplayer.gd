@@ -257,6 +257,8 @@ func end_game() -> void:
 	online_play = false
 	if is_instance_valid(mp_layer):
 		mp_layer.queue_free()
+	for i in game.data_nodes.get_children():
+		i.queue_free()
 
 
 func is_host() -> bool:

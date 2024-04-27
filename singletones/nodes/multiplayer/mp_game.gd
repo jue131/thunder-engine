@@ -193,7 +193,7 @@ func player_changed_suit(suit_path: String, appear: bool, forced: bool, send_sig
 @rpc("authority", "call_local", "reliable")
 func finish_level(p_id: int):
 	level_completed = true
-	chat_message.emit(str(p_id) + " finished the level!")
+	chat_message.emit(Multiplayer.get_player_name(p_id) + " finished the level!")
 	
 	if p_id == multiplayer.get_unique_id():
 		return
